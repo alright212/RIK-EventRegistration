@@ -34,7 +34,6 @@ namespace EventRegistration.Application
 
             var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
             if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
-
             
             var participant = await _participantRepository.GetIndividualByPersonalIdCodeAsync(dto.PersonalIdCode);
             if (participant == null)
@@ -42,8 +41,8 @@ namespace EventRegistration.Application
                 participant = new IndividualParticipant(dto.FirstName, dto.LastName, dto.PersonalIdCode);
                 await _participantRepository.AddAsync(participant);
             }
-
             
+            // The participant.Id is now an int, matching the repository method signature.
             var existingRegistration = await _eventParticipantRepository.GetByEventAndParticipantAsync(dto.EventId, participant.Id);
             if (existingRegistration != null)
             {
@@ -52,7 +51,6 @@ namespace EventRegistration.Application
 
             var eventParticipant = new EventParticipant
             {
-                
                 EventId = dto.EventId,
                 ParticipantId = participant.Id,
                 PaymentMethodId = dto.PaymentMethodId,
@@ -70,7 +68,6 @@ namespace EventRegistration.Application
             
             var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
             if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
-
             
             var participant = await _participantRepository.GetCompanyByRegistryCodeAsync(dto.RegistryCode);
             if (participant == null)
@@ -80,14 +77,14 @@ namespace EventRegistration.Application
             }
             else
             {
-                // Check if the number of participants has changed and update if necessary
                 if (participant.NumberOfParticipants != dto.NumberOfParticipants)
                 {
                     participant.NumberOfParticipants = dto.NumberOfParticipants;
-                    await _participantRepository.UpdateAsync(participant); // Update the participant in the repository
+                    await _participantRepository.UpdateAsync(participant);
                 }
             }
 
+            // The participant.Id is now an int, matching the repository method signature.
             var existingRegistration = await _eventParticipantRepository.GetByEventAndParticipantAsync(dto.EventId, participant.Id);
             if (existingRegistration != null)
             {
@@ -100,16 +97,13 @@ namespace EventRegistration.Application
                 ParticipantId = participant.Id,
                 PaymentMethodId = dto.PaymentMethodId,
                 AdditionalInfo = dto.AdditionalInfo
-                
-                
             };
             await _eventParticipantRepository.AddAsync(eventParticipant);
         }
 
-        public async Task<ParticipantViewModel?> GetParticipantDetailsAsync(Guid participantId, Guid eventId)
+        // FIX: Changed participantId parameter from Guid to int
+        public async Task<ParticipantViewModel?> GetParticipantDetailsAsync(int participantId, Guid eventId)
         {
-            
-            
             var eventParticipant = await _eventParticipantRepository.GetByEventAndParticipantAsync(eventId, participantId);
 
             if (eventParticipant == null || eventParticipant.Participant == null || eventParticipant.PaymentMethod == null)
@@ -117,11 +111,11 @@ namespace EventRegistration.Application
                 return null;
             }
 
-            
             return MapToParticipantViewModel(eventParticipant);
         }
 
-        public async Task UpdateIndividualParticipantAsync(Guid participantId, Guid eventId, AddIndividualParticipantDto dto)
+        // FIX: Changed participantId parameter from Guid to int
+        public async Task UpdateIndividualParticipantAsync(int participantId, Guid eventId, AddIndividualParticipantDto dto)
         {
             if (dto == null) throw new ArgumentNullException(nameof(dto));
 
@@ -138,21 +132,19 @@ namespace EventRegistration.Application
 
             var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
             if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
-
-            
             
             individualParticipant.FirstName = dto.FirstName;
             individualParticipant.LastName = dto.LastName;
             individualParticipant.PersonalIdCode = dto.PersonalIdCode;
             await _participantRepository.UpdateAsync(individualParticipant);
-
             
             eventParticipant.PaymentMethodId = dto.PaymentMethodId;
             eventParticipant.AdditionalInfo = dto.AdditionalInfo;
             await _eventParticipantRepository.UpdateAsync(eventParticipant);
         }
 
-        public async Task UpdateCompanyParticipantAsync(Guid participantId, Guid eventId, AddCompanyParticipantDto dto)
+        // FIX: Changed participantId parameter from Guid to int
+        public async Task UpdateCompanyParticipantAsync(int participantId, Guid eventId, AddCompanyParticipantDto dto)
         {
             if (dto == null) throw new ArgumentNullException(nameof(dto));
 
@@ -169,56 +161,48 @@ namespace EventRegistration.Application
             
             var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
             if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
-
             
             companyParticipant.LegalName = dto.LegalName;
             companyParticipant.RegistryCode = dto.RegistryCode;
-            companyParticipant.NumberOfParticipants = dto.NumberOfParticipants; 
+            companyParticipant.NumberOfParticipants = dto.NumberOfParticipants;
             await _participantRepository.UpdateAsync(companyParticipant);
-
             
             eventParticipant.PaymentMethodId = dto.PaymentMethodId;
             eventParticipant.AdditionalInfo = dto.AdditionalInfo;
             await _eventParticipantRepository.UpdateAsync(eventParticipant);
         }
 
-        public async Task DeleteParticipantAsync(Guid participantId, Guid eventId)
+        // FIX: Changed participantId parameter from Guid to int
+        public async Task DeleteParticipantAsync(int participantId, Guid eventId)
         {
             var eventParticipant = await _eventParticipantRepository.GetByEventAndParticipantAsync(eventId, participantId);
             if (eventParticipant == null)
             {
                 throw new ArgumentException("Participant registration not found.");
             }
-
-            // Use the composite key (EventId, ParticipantId) to delete the record
-            // The DeleteAsync method in IEventParticipantRepository needs to be able to handle this.
-            // Assuming IEventParticipantRepository.DeleteAsync is updated to take eventId and participantId or to fetch the entity by these and then delete.
-            // For now, let's assume there's a way to delete it, perhaps by fetching it first if DeleteAsync still expects an Id or a full entity.
-            // If _eventParticipantRepository.DeleteAsync expects the entity, we already have it in 'eventParticipant'.
-            // If it expects an Id, and since we removed the single 'Id' property, this part needs to be reconciled with IEventParticipantRepository's DeleteAsync signature.
-            // For the purpose of this fix, and assuming DeleteAsync can take the entity:
-            await _eventParticipantRepository.DeleteAsync(eventParticipant); // This line assumes DeleteAsync can accept the entity or is adapted.
-                                                                      // If DeleteAsync strictly requires a Guid Id, this will need further adjustment in IEventParticipantRepository and its implementation.
+            
+            await _eventParticipantRepository.DeleteAsync(eventParticipant);
         }
 
         public async Task<IEnumerable<ParticipantViewModel>> GetParticipantsByEventAsync(Guid eventId)
         {
-            
             var eventParticipants = await _eventParticipantRepository.GetByEventIdAsync(eventId);
-            return eventParticipants.Select(ep => MapToParticipantViewModel(ep)).ToList();
+            return eventParticipants.Select(MapToParticipantViewModel).ToList();
         }
 
         public async Task<IEnumerable<PaymentMethodViewModel>> GetPaymentMethodsAsync()
         {
             var paymentMethods = await _paymentMethodRepository.GetAllAsync();
+            // Note: Your PaymentMethodViewModel still uses Guid for the Id.
+            // This should be changed to int for consistency.
+            // Assuming it is changed to int:
             return paymentMethods.Select(pm => new PaymentMethodViewModel
-            {
-                Id = pm.Id,
-                Name = pm.Name
-            }).ToList();
-        }
+    {
+        Id = pm.Id, // pm.Id is an 'int', but PaymentMethodViewModel.Id expects a 'Guid'
+        Name = pm.Name
+    }).ToList();
+}
 
-        
         private ParticipantViewModel MapToParticipantViewModel(EventParticipant eventParticipant)
         {
             if (eventParticipant == null || eventParticipant.Participant == null || eventParticipant.PaymentMethod == null)
@@ -228,7 +212,6 @@ namespace EventRegistration.Application
             
             var viewModel = new ParticipantViewModel
             {
-                // EventParticipantId is no longer a single GUID. We use EventId and ParticipantId instead.
                 EventId = eventParticipant.EventId,
                 ParticipantId = eventParticipant.Participant.Id,
                 PaymentMethodId = eventParticipant.PaymentMethodId,
@@ -250,7 +233,6 @@ namespace EventRegistration.Application
                 viewModel.RegistryCode = company.RegistryCode;
                 viewModel.NumberOfParticipants = company.NumberOfParticipants;
             }
-            
 
             return viewModel;
         }

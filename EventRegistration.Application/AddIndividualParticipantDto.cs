@@ -21,7 +21,8 @@ namespace EventRegistration.Application
         public string PersonalIdCode { get; set; } = string.Empty;
 
         [Required]
-        public Guid PaymentMethodId { get; set; }
+        // FIX: Changed PaymentMethodId from Guid to int
+        public int PaymentMethodId { get; set; }
 
         [StringLength(1500)]
         public string? AdditionalInfo { get; set; }

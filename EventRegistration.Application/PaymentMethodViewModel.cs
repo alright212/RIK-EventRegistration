@@ -4,7 +4,8 @@ namespace EventRegistration.Application
 {
     public class PaymentMethodViewModel
     {
-        public Guid Id { get; set; }
+        // FIX: Changed Id from Guid to int to match the domain entity.
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
     }
 }

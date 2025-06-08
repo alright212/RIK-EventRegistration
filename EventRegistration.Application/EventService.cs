@@ -20,7 +20,7 @@ namespace EventRegistration.Application
             _dbContext = dbContext;
         }
 
-        public async Task CreateEventAsync(CreateEventDto createEventDto)
+        public async Task CreateEvent(CreateEventDto createEventDto)
         {
             if (createEventDto.AdditionalInfo?.Length > 1000)
             {
@@ -37,69 +37,85 @@ namespace EventRegistration.Application
             await _eventRepository.AddAsync(newEvent);
         }
 
-        public async Task<IEnumerable<EventViewModel>> GetFutureEventsAsync()
+        public async Task<IEnumerable<EventViewModel>> GetUpcomingEvents()
         {
-            var events = await _eventRepository.GetAllAsync();
+            var events = await _eventRepository.GetUpcomingEvents();
             return events
-                .Where(e => e.EventTime > DateTime.UtcNow)
                 .Select(e => new EventViewModel
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    EventTime = e.EventTime,
+                    EventTime = e.Time,
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
-                    ParticipantCount = e.EventParticipants?.Count ?? 0
+                    ParticipantCount = e.Participants?.Count ?? 0
                 })
                 .OrderBy(e => e.EventTime);
         }
 
-        public async Task<IEnumerable<EventViewModel>> GetPastEventsAsync()
+        public async Task<IEnumerable<EventViewModel>> GetPastEvents()
         {
             var events = await _eventRepository.GetAllAsync();
             return events
-                .Where(e => e.EventTime <= DateTime.UtcNow)
+                .Where(e => e.Time <= DateTime.UtcNow)
                 .Select(e => new EventViewModel
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    EventTime = e.EventTime,
+                    EventTime = e.Time,
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
-                    ParticipantCount = e.EventParticipants?.Count ?? 0
+                    ParticipantCount = e.Participants?.Count ?? 0
                 })
                 .OrderByDescending(e => e.EventTime);
         }
 
-        public async Task<EventViewModel?> GetEventDetailsAsync(Guid eventId)
+        public async Task<EventDetailViewModel?> GetEventDetail(Guid id)
         {
-            var eventEntity = await _eventRepository.GetByIdAsync(eventId);
+            var eventEntity = await _eventRepository.GetEventWithParticipantsAsync(id);
             if (eventEntity == null)
             {
                 return null;
             }
 
-            return new EventViewModel
+            return new EventDetailViewModel
             {
-                Id = eventEntity.Id,
+                Event = new EventViewModel
+                {
+                    Id = eventEntity.Id,
+                    Name = eventEntity.Name,
+                    EventTime = eventEntity.Time,
+                    Location = eventEntity.Location,
+                    AdditionalInfo = eventEntity.AdditionalInfo,
+                    ParticipantCount = eventEntity.Participants?.Count ?? 0
+                },
+                Participants = eventEntity.Participants?.Select(ep => new ParticipantViewModel { /* map properties */ }) ?? new List<ParticipantViewModel>()
+            };
+        }
+        
+        public async Task<UpdateEventDto?> GetEventForEdit(Guid id)
+        {
+            var eventEntity = await _eventRepository.GetByIdAsync(id);
+            if (eventEntity == null)
+            {
+                return null;
+            }
+            return new UpdateEventDto
+            {
                 Name = eventEntity.Name,
-                EventTime = eventEntity.EventTime,
+                EventTime = eventEntity.Time,
                 Location = eventEntity.Location,
-                AdditionalInfo = eventEntity.AdditionalInfo,
-                ParticipantCount = eventEntity.EventParticipants?.Count ?? 0
+                AdditionalInfo = eventEntity.AdditionalInfo
             };
         }
 
-        public async Task UpdateEventAsync(Guid eventId, UpdateEventDto updateEventDto)
+        public async Task UpdateEvent(Guid eventId, UpdateEventDto updateEventDto) // Changed signature
         {
-            
-            var eventToUpdate = await _eventRepository.GetByIdAsync(eventId);
+            var eventToUpdate = await _eventRepository.GetByIdAsync(eventId); // Use eventId parameter
             if (eventToUpdate == null)
             {
-                
                 throw new KeyNotFoundException("Event not found.");
             }
-
             
             eventToUpdate.UpdateDetails(
                 updateEventDto.Name,
@@ -107,30 +123,25 @@ namespace EventRegistration.Application
                 updateEventDto.Location,
                 updateEventDto.AdditionalInfo
             );
-
             
             await _eventRepository.UpdateAsync(eventToUpdate);
         }
 
-        public async Task DeleteEventAsync(Guid eventId)
+
+        public async Task DeleteEvent(Guid id)
         {
-            
-            var eventToDelete = await _eventRepository.GetByIdAsync(eventId);
+            var eventToDelete = await _eventRepository.GetByIdAsync(id);
             if (eventToDelete == null)
             {
-                
-                return;
+                return; 
             }
 
-            if (eventToDelete.EventTime <= DateTime.UtcNow)
+            if (eventToDelete.Time <= DateTime.UtcNow)
             {
-                
                 throw new InvalidOperationException("Cannot delete past or current events.");
             }
-
             
-            
-            await _eventRepository.DeleteAsync(eventId);
+            await _eventRepository.RemoveAsync(eventToDelete);
         }
     }
 }

@@ -1,26 +1,37 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventRegistration.Domain
 {
     public class Event
     {
-        public Guid Id { get; private set; }
-        public string Name { get; private set; }
-        public DateTime EventTime { get; private set; }
-        public string Location { get; private set; }
-        public string AdditionalInfo { get; private set; }
-
-        public ICollection<EventParticipant> EventParticipants { get; set; }
-
-        
-        private Event()
+        // Add a public constructor to allow instantiation.
+        public Event() 
         {
             Name = string.Empty;
             Location = string.Empty;
             AdditionalInfo = string.Empty;
-            EventParticipants = new HashSet<EventParticipant>();
+            Participants = new List<EventParticipant>();
         }
+
+        [Key]
+        public Guid Id { get; set; } // Make the setter public
+
+        [Required]
+        [StringLength(100)]
+        public string Name { get; set; }
+
+        public DateTime Time { get; set; } // Renamed from EventTime
+
+        [Required]
+        [StringLength(100)]
+        public string Location { get; set; }
+
+        [StringLength(1000)]
+        public string AdditionalInfo { get; set; }
+        
+        public ICollection<EventParticipant> Participants { get; set; } = new List<EventParticipant>(); // Renamed from EventParticipants and initialized
 
         public Event(string name, DateTime eventTime, string location, string additionalInfo)
         {
@@ -31,15 +42,12 @@ namespace EventRegistration.Domain
 
             Id = Guid.NewGuid();
             Name = name;
-            EventTime = eventTime;
+            Time = eventTime; // Adjusted to new property name
             Location = location;
             AdditionalInfo = additionalInfo;
-            EventParticipants = new HashSet<EventParticipant>();
+            Participants = new HashSet<EventParticipant>(); // Adjusted to new property name
         }
 
-        
-        
-        
         public void UpdateDetails(string name, DateTime eventTime, string location, string? additionalInfo)
         {
             if (eventTime <= DateTime.UtcNow)
@@ -47,7 +55,7 @@ namespace EventRegistration.Domain
                 throw new ArgumentException("Event time must be in the future.", nameof(eventTime));
             }
             Name = name;
-            EventTime = eventTime;
+            Time = eventTime; // Adjusted to new property name
             Location = location;
             AdditionalInfo = additionalInfo ?? string.Empty;
         }

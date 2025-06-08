@@ -6,11 +6,12 @@ namespace EventRegistration.Application
 {
     public interface IEventService
     {
-        Task<IEnumerable<EventViewModel>> GetFutureEventsAsync();
-        Task<IEnumerable<EventViewModel>> GetPastEventsAsync();
-        Task CreateEventAsync(CreateEventDto createEventDto);
-        Task<EventViewModel?> GetEventDetailsAsync(Guid eventId);
-        Task UpdateEventAsync(Guid eventId, UpdateEventDto updateEventDto);
-        Task DeleteEventAsync(Guid eventId);
+        Task<IEnumerable<EventViewModel>> GetUpcomingEvents();
+        Task<IEnumerable<EventViewModel>> GetPastEvents();
+        Task<EventDetailViewModel?> GetEventDetail(Guid id); // Changed int to Guid, made nullable
+        Task<UpdateEventDto?> GetEventForEdit(Guid id); // Changed int to Guid, made nullable
+        Task CreateEvent(CreateEventDto createEventDto);
+        Task UpdateEvent(Guid eventId, UpdateEventDto updateEventDto); // Changed signature
+        Task DeleteEvent(Guid id); // Changed int to Guid
     }
 }

@@ -26,7 +26,7 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
-            var eventDetails = await _eventService.GetEventDetailsAsync(eventId);
+            var eventDetails = await _eventService.GetEventDetail(eventId); // Changed from GetEventDetailsAsync to GetEventDetail
             if (eventDetails == null)
             {
                 return NotFound();
@@ -37,7 +37,7 @@ namespace WebApplication1.Controllers
             var viewModel = new AddOrEditParticipantViewModel
             {
                 EventId = eventId,
-                EventName = eventDetails.Name,
+                EventName = eventDetails.Event.Name, // Access Name via eventDetails.Event.Name
                 PaymentMethods = paymentMethods.Select(p => new SelectListItem(p.Name, p.Id.ToString())).ToList(),
                 Individual = new AddIndividualParticipantDto { EventId = eventId },
                 Company = new AddCompanyParticipantDto { EventId = eventId }
@@ -75,9 +75,9 @@ namespace WebApplication1.Controllers
             }
 
             // If we get here, something failed. Repopulate the necessary view data and return the view.
-            var eventDetails = await _eventService.GetEventDetailsAsync(viewModel.EventId);
+            var eventDetails = await _eventService.GetEventDetail(viewModel.EventId); // Changed from GetEventDetailsAsync to GetEventDetail
             var paymentMethods = await _participantService.GetPaymentMethodsAsync();
-            viewModel.EventName = eventDetails?.Name ?? "Event";
+            viewModel.EventName = eventDetails?.Event?.Name ?? "Event"; // Access Name via eventDetails.Event.Name
             viewModel.PaymentMethods = paymentMethods.Select(p => new SelectListItem(p.Name, p.Id.ToString())).ToList();
 
             return View(viewModel);

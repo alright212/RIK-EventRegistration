@@ -26,9 +26,10 @@ namespace EventRegistration.Infrastructure
                 .HasKey(ep => new { ep.EventId, ep.ParticipantId });
 
             
+            // Correct the navigation property name from e.EventParticipants to e.Participants
             modelBuilder.Entity<EventParticipant>()
                 .HasOne(ep => ep.Event)
-                .WithMany(e => e.EventParticipants)
+                .WithMany(e => e.Participants) 
                 .HasForeignKey(ep => ep.EventId);
 
             modelBuilder.Entity<EventParticipant>()
