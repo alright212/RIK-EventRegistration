@@ -16,9 +16,9 @@ namespace EventRegistration.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Event> GetByIdAsync(Guid id)
+        public async Task<Event?> GetByIdAsync(Guid id) // Return type changed to nullable Event
         {
-            return await _context.Events.FindAsync(id);
+            return await _context.Events.Include(e => e.EventParticipants).FirstOrDefaultAsync(e => e.Id == id); // Added Include and changed to FirstOrDefaultAsync
         }
 
         public async Task<IEnumerable<Event>> GetAllAsync()
@@ -58,18 +58,17 @@ namespace EventRegistration.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Participant> GetByIdAsync(Guid id)
+        public async Task<Participant?> GetByIdAsync(Guid id) // Return type changed to nullable Participant
         {
             return await _context.Participants.FindAsync(id);
         }
 
         public async Task<IEnumerable<Participant>> GetByEventIdAsync(Guid eventId)
         {
-            // Updated to query through EventParticipants linking table
             return await _context.EventParticipants
                 .Where(ep => ep.EventId == eventId)
-                .Select(ep => ep.Participant)
-                .ToListAsync();
+                .Select(ep => ep.Participant!)
+                .ToListAsync(); // Added null-forgiving operator as Participant should exist if EventParticipant exists
         }
 
         public async Task AddAsync(Participant entity)
@@ -104,7 +103,7 @@ namespace EventRegistration.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<PaymentMethod> GetByIdAsync(Guid id)
+        public async Task<PaymentMethod?> GetByIdAsync(Guid id) // Return type changed to nullable PaymentMethod
         {
             return await _context.PaymentMethods.FindAsync(id);
         }
