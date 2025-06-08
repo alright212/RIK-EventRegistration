@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 
 namespace EventRegistration.Domain
 {
@@ -11,7 +11,16 @@ namespace EventRegistration.Domain
         public string Location { get; private set; }
         public string AdditionalInfo { get; private set; }
 
-        public ICollection<EventParticipant> EventParticipants { get; set; } 
+        public ICollection<EventParticipant> EventParticipants { get; set; }
+
+        
+        private Event()
+        {
+            Name = string.Empty;
+            Location = string.Empty;
+            AdditionalInfo = string.Empty;
+            EventParticipants = new HashSet<EventParticipant>();
+        }
 
         public Event(string name, DateTime eventTime, string location, string additionalInfo)
         {
@@ -25,7 +34,22 @@ namespace EventRegistration.Domain
             EventTime = eventTime;
             Location = location;
             AdditionalInfo = additionalInfo;
-            EventParticipants = new HashSet<EventParticipant>(); 
+            EventParticipants = new HashSet<EventParticipant>();
+        }
+
+        
+        
+        
+        public void UpdateDetails(string name, DateTime eventTime, string location, string? additionalInfo)
+        {
+            if (eventTime <= DateTime.UtcNow)
+            {
+                throw new ArgumentException("Event time must be in the future.", nameof(eventTime));
+            }
+            Name = name;
+            EventTime = eventTime;
+            Location = location;
+            AdditionalInfo = additionalInfo ?? string.Empty;
         }
     }
 }

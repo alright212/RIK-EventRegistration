@@ -23,7 +23,7 @@ namespace EventRegistration.Infrastructure.Repositories
 
         public async Task<IEnumerable<Event>> GetAllAsync()
         {
-            return await _context.Events.ToListAsync();
+            return await _context.Events.Include(e => e.EventParticipants).ToListAsync();
         }
 
         public async Task AddAsync(Event entity)
@@ -185,9 +185,8 @@ namespace EventRegistration.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(EventParticipant entity)
         {
-            var entity = await GetByIdAsync(id);
             if (entity != null)
             {
                 _context.EventParticipants.Remove(entity);

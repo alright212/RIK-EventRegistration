@@ -38,7 +38,7 @@ namespace EventRegistration.Domain
         Task<IEnumerable<EventParticipant>> GetByEventIdAsync(Guid eventId);
         Task AddAsync(EventParticipant entity);
         Task UpdateAsync(EventParticipant entity);
-        Task DeleteAsync(Guid id); 
+        Task DeleteAsync(EventParticipant entity); 
         Task<EventParticipant?> GetByEventAndParticipantAsync(Guid eventId, Guid participantId);
     }
 }

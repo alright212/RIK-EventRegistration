@@ -4,7 +4,6 @@ namespace EventRegistration.Domain
 {
     public class EventParticipant
     {
-        public Guid Id { get; set; } 
         public Guid EventId { get; set; }
         public Event? Event { get; set; } 
 

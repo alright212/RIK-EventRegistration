@@ -1,5 +1,8 @@
 using EventRegistration.Domain;
 using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EventRegistration.Application
 {
@@ -14,17 +17,16 @@ namespace EventRegistration.Application
 
         public async Task CreateEventAsync(CreateEventDto createEventDto)
         {
-            
             if (createEventDto.AdditionalInfo?.Length > 1000)
             {
-                 throw new ArgumentException("Additional info cannot exceed 1000 characters.", nameof(createEventDto.AdditionalInfo));
+                throw new ArgumentException("Additional info cannot exceed 1000 characters.", nameof(createEventDto.AdditionalInfo));
             }
 
             var newEvent = new Event(
                 createEventDto.Name,
                 createEventDto.EventTime,
                 createEventDto.Location,
-                createEventDto.AdditionalInfo ?? string.Empty 
+                createEventDto.AdditionalInfo ?? string.Empty
             );
 
             await _eventRepository.AddAsync(newEvent);
@@ -32,7 +34,7 @@ namespace EventRegistration.Application
 
         public async Task<IEnumerable<EventViewModel>> GetFutureEventsAsync()
         {
-            var events = await _eventRepository.GetAllAsync(); 
+            var events = await _eventRepository.GetAllAsync();
             return events
                 .Where(e => e.EventTime > DateTime.UtcNow)
                 .Select(e => new EventViewModel
@@ -42,7 +44,7 @@ namespace EventRegistration.Application
                     EventTime = e.EventTime,
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
-                    ParticipantCount = e.EventParticipants?.Count ?? 0 
+                    ParticipantCount = e.EventParticipants?.Count ?? 0
                 })
                 .OrderBy(e => e.EventTime);
         }
@@ -59,7 +61,7 @@ namespace EventRegistration.Application
                     EventTime = e.EventTime,
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
-                    ParticipantCount = e.EventParticipants?.Count ?? 0 
+                    ParticipantCount = e.EventParticipants?.Count ?? 0
                 })
                 .OrderByDescending(e => e.EventTime);
         }
@@ -79,8 +81,51 @@ namespace EventRegistration.Application
                 EventTime = eventEntity.EventTime,
                 Location = eventEntity.Location,
                 AdditionalInfo = eventEntity.AdditionalInfo,
-                ParticipantCount = eventEntity.EventParticipants?.Count ?? 0 
+                ParticipantCount = eventEntity.EventParticipants?.Count ?? 0
             };
+        }
+
+        public async Task UpdateEventAsync(Guid eventId, UpdateEventDto updateEventDto)
+        {
+            
+            var eventToUpdate = await _eventRepository.GetByIdAsync(eventId);
+            if (eventToUpdate == null)
+            {
+                
+                throw new KeyNotFoundException("Event not found.");
+            }
+
+            
+            eventToUpdate.UpdateDetails(
+                updateEventDto.Name,
+                updateEventDto.EventTime,
+                updateEventDto.Location,
+                updateEventDto.AdditionalInfo
+            );
+
+            
+            await _eventRepository.UpdateAsync(eventToUpdate);
+        }
+
+        public async Task DeleteEventAsync(Guid eventId)
+        {
+            
+            var eventToDelete = await _eventRepository.GetByIdAsync(eventId);
+            if (eventToDelete == null)
+            {
+                
+                return;
+            }
+
+            if (eventToDelete.EventTime <= DateTime.UtcNow)
+            {
+                
+                throw new InvalidOperationException("Cannot delete past or current events.");
+            }
+
+            
+            
+            await _eventRepository.DeleteAsync(eventId);
         }
     }
 }

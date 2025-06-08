@@ -10,5 +10,7 @@ namespace EventRegistration.Application
         Task<IEnumerable<EventViewModel>> GetPastEventsAsync();
         Task CreateEventAsync(CreateEventDto createEventDto);
         Task<EventViewModel?> GetEventDetailsAsync(Guid eventId);
+        Task UpdateEventAsync(Guid eventId, UpdateEventDto updateEventDto);
+        Task DeleteEventAsync(Guid eventId);
     }
 }
