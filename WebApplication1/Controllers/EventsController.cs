@@ -1,6 +1,8 @@
 using EventRegistration.Application;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace WebApplication1.Controllers
@@ -8,10 +10,12 @@ namespace WebApplication1.Controllers
     public class EventsController : Controller
     {
         private readonly IEventService _eventService;
+        private readonly IParticipantService _participantService;
 
-        public EventsController(IEventService eventService)
+        public EventsController(IEventService eventService, IParticipantService participantService)
         {
             _eventService = eventService;
+            _participantService = participantService;
         }
 
         // GET: Events/Create
@@ -55,6 +59,11 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
+
+            // Get payment methods for the add participant form
+            var paymentMethods = await _participantService.GetPaymentMethodsAsync();
+            ViewBag.PaymentMethods = paymentMethods.Select(p => new SelectListItem(p.Name, p.Id.ToString())).ToList();
+            ViewBag.EventId = id;
             
             // FIX: The view model for details is EventDetailViewModel, which contains the event info.
             ViewBag.EventName = eventDetails.Event.Name;

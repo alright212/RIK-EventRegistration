@@ -115,14 +115,33 @@ namespace WebApplication1.Controllers
                 ModelState.AddModelError(string.Empty, "An error occurred while adding the participant. Please try again.");
             }
             
-            // If we got this far, something failed, redisplay form
+            // If we got this far, something failed
+            // Store validation errors in TempData and redirect back to Events/Details
+            TempData["ValidationErrors"] = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage ?? "Validation error").ToArray() ?? new string[0]
+            );
             
-            var eventDetails = await _eventService.GetEventDetail(viewModel.EventId);
-            var paymentMethods = await _participantService.GetPaymentMethodsAsync();
-            viewModel.EventName = eventDetails?.Event?.Name ?? "Event";
-            viewModel.PaymentMethods = paymentMethods.Select(p => new SelectListItem(p.Name, p.Id.ToString())).ToList();
+            // Store the submitted form data to repopulate the form
+            TempData["ParticipantType"] = viewModel.ParticipantType;
+            if (viewModel.ParticipantType == "Individual")
+            {
+                TempData["Individual.FirstName"] = viewModel.Individual?.FirstName;
+                TempData["Individual.LastName"] = viewModel.Individual?.LastName;
+                TempData["Individual.PersonalIdCode"] = viewModel.Individual?.PersonalIdCode;
+                TempData["Individual.PaymentMethodId"] = viewModel.Individual?.PaymentMethodId;
+                TempData["Individual.AdditionalInfo"] = viewModel.Individual?.AdditionalInfo;
+            }
+            else if (viewModel.ParticipantType == "Company")
+            {
+                TempData["Company.LegalName"] = viewModel.Company?.LegalName;
+                TempData["Company.RegistryCode"] = viewModel.Company?.RegistryCode;
+                TempData["Company.NumberOfParticipants"] = viewModel.Company?.NumberOfParticipants;
+                TempData["Company.PaymentMethodId"] = viewModel.Company?.PaymentMethodId;
+                TempData["Company.AdditionalInfo"] = viewModel.Company?.AdditionalInfo;
+            }
 
-            return View(viewModel);
+            return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
         }
 
         // POST: Participants/Delete/{eventId}/{participantId}
