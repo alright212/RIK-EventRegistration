@@ -1,8 +1,88 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Avaleht";
+    // Dummy data for events - replace with actual data from your ViewModel
+    // You would typically pass this data from your HomeController's Index action
+    var futureEvents = new List<dynamic>
+    {
+        new { Id = Guid.NewGuid(), Name = "Konverents \"Innovatsioon 2025\"", EventTime = new DateTime(2025, 10, 15) },
+        new { Id = Guid.NewGuid(), Name = "Muusikafestival \"Suveheli\"", EventTime = new DateTime(2025, 7, 22) }
+    };
+    var pastEvents = new List<dynamic>
+    {
+        new { Id = Guid.NewGuid(), Name = "Kunstinäitus \"Värvide Mäng\"", EventTime = new DateTime(2025, 4, 5) },
+        new { Id = Guid.NewGuid(), Name = "Spordivõistlus \"Kevadspartakiaad\"", EventTime = new DateTime(2025, 5, 20) }
+    };
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4 mb-4">
+    <!-- Top section: Info box and Image -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-7">
+            <div class="homepage-info-box p-4">
+                <h1>Tere tulemast ürituste lehele!</h1>
+                <p class="lead">Avasta põnevaid sündmusi ja halda oma osavõtte lihtsalt ja mugavalt.</p>
+                <p>Siit leiad nii tulevasi kui ka juba toimunud üritusi. Loo uusi sündmusi, kutsu osalejaid ja pea järge kõige olulisema üle. Meie platvorm on loodud selleks, et ürituste korraldamine oleks sujuv ja nauditav kogemus.</p>
+                <p>Kasuta navigeerimisriba, et lisada uus üritus või sirvida olemasolevaid. Küsimuste korral võta meiega julgelt ühendust!</p>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <img src="~/images/pilt.jpg" alt="Ürituse illustratsioon" class="img-fluid rounded shadow-sm" />
+        </div>
+    </div>
+
+    <!-- Bottom section: Event Lists -->
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="event-list-header border-bottom pb-2 mb-3">Tulevased üritused</h2>
+            @if (futureEvents.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var ev in futureEvents)
+                    {
+                        <li class="event-item mb-3 p-3 border rounded shadow-sm">
+                            <div class="event-item-info">
+                                <strong>@ev.Name</strong>
+                                <span>@ev.EventTime.ToString("dd.MM.yyyy")</span>
+                            </div>
+                            <div class="event-item-actions mt-2 mt-md-0">
+                                <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-primary">Osavõtjad</a>
+                                <a href="#" class="btn btn-sm btn-outline-danger" title="Kustuta üritus">
+                                    <img src="~/images/remove.png" alt="Kustuta" style="height: 16px; vertical-align: middle;" />
+                                </a>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Tulevasi üritusi ei leitud.</p>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <h2 class="event-list-header border-bottom pb-2 mb-3">Toimunud üritused</h2>
+            @if (pastEvents.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var ev in pastEvents)
+                    {
+                        <li class="event-item mb-3 p-3 border rounded shadow-sm">
+                            <div class="event-item-info">
+                                <strong>@ev.Name</strong>
+                                <span>@ev.EventTime.ToString("dd.MM.yyyy")</span>
+                            </div>
+                            <div class="event-item-actions mt-2 mt-md-0">
+                                <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-secondary">Osavõtjad</a>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Toimunud üritusi ei leitud.</p>
+            }
+        </div>
+    </div>
 </div>
