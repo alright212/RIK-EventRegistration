@@ -1,16 +1,17 @@
 using EventRegistration.Domain;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventRegistration.Application
 {
     public class ParticipantService : IParticipantService
     {
-        // You will need to inject repositories here
         private readonly IParticipantRepository _participantRepository;
         private readonly IEventRepository _eventRepository;
         private readonly IEventParticipantRepository _eventParticipantRepository;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
-
 
         public ParticipantService(
             IParticipantRepository participantRepository,
@@ -18,58 +19,255 @@ namespace EventRegistration.Application
             IEventParticipantRepository eventParticipantRepository,
             IPaymentMethodRepository paymentMethodRepository)
         {
-            _participantRepository = participantRepository;
-            _eventRepository = eventRepository;
-            _eventParticipantRepository = eventParticipantRepository;
-            _paymentMethodRepository = paymentMethodRepository;
+            _participantRepository = participantRepository ?? throw new ArgumentNullException(nameof(participantRepository));
+            _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
+            _eventParticipantRepository = eventParticipantRepository ?? throw new ArgumentNullException(nameof(eventParticipantRepository));
+            _paymentMethodRepository = paymentMethodRepository ?? throw new ArgumentNullException(nameof(paymentMethodRepository));
         }
 
-        // Implementation of IParticipantService methods will go here
-        // For example:
         public async Task AddIndividualParticipantAsync(AddIndividualParticipantDto dto)
         {
-            // 1. Validate that the event exists
-            // 2. Check if a participant with the given PersonalIdCode already exists.
-            //    If not, create a new IndividualParticipant.
-            // 3. Create a new EventParticipant to link the participant and event.
-            // 4. Save changes to the database.
-            throw new NotImplementedException();
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+
+            var eventExists = await _eventRepository.GetByIdAsync(dto.EventId);
+            if (eventExists == null) throw new ArgumentException("Event not found.", nameof(dto.EventId));
+
+            var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
+            if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
+
+            
+            var participant = await _participantRepository.GetIndividualByPersonalIdCodeAsync(dto.PersonalIdCode);
+            if (participant == null)
+            {
+                participant = new IndividualParticipant(dto.FirstName, dto.LastName, dto.PersonalIdCode);
+                await _participantRepository.AddAsync(participant);
+            }
+
+            
+            var existingRegistration = await _eventParticipantRepository.GetByEventAndParticipantAsync(dto.EventId, participant.Id);
+            if (existingRegistration != null)
+            {
+                throw new InvalidOperationException("Participant is already registered for this event.");
+            }
+
+            var eventParticipant = new EventParticipant
+            {
+                
+                EventId = dto.EventId,
+                ParticipantId = participant.Id,
+                PaymentMethodId = dto.PaymentMethodId,
+                AdditionalInfo = dto.AdditionalInfo
+            };
+            await _eventParticipantRepository.AddAsync(eventParticipant);
         }
 
         public async Task AddCompanyParticipantAsync(AddCompanyParticipantDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+
+            var eventExists = await _eventRepository.GetByIdAsync(dto.EventId);
+            if (eventExists == null) throw new ArgumentException("Event not found.", nameof(dto.EventId));
+            
+            var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
+            if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
+
+            
+            var participant = await _participantRepository.GetCompanyByRegistryCodeAsync(dto.RegistryCode);
+            if (participant == null)
+            {
+                participant = new CompanyParticipant(dto.LegalName, dto.RegistryCode, dto.NumberOfParticipants);
+                await _participantRepository.AddAsync(participant);
+            }
+            else
+            {
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                if (participant.NumberOfParticipants != dto.NumberOfParticipants) {
+                    
+                    
+                    
+                    
+                    
+                }
+            }
+
+            var existingRegistration = await _eventParticipantRepository.GetByEventAndParticipantAsync(dto.EventId, participant.Id);
+            if (existingRegistration != null)
+            {
+                throw new InvalidOperationException("Participant is already registered for this event.");
+            }
+
+            var eventParticipant = new EventParticipant
+            {
+                EventId = dto.EventId,
+                ParticipantId = participant.Id,
+                PaymentMethodId = dto.PaymentMethodId,
+                AdditionalInfo = dto.AdditionalInfo
+                
+                
+            };
+            await _eventParticipantRepository.AddAsync(eventParticipant);
         }
 
         public async Task<ParticipantViewModel?> GetParticipantDetailsAsync(Guid participantId, Guid eventId)
         {
-            throw new NotImplementedException();
+            
+            
+            var eventParticipant = await _eventParticipantRepository.GetByEventAndParticipantAsync(eventId, participantId);
+
+            if (eventParticipant == null || eventParticipant.Participant == null || eventParticipant.PaymentMethod == null)
+            {
+                return null;
+            }
+
+            
+            return MapToParticipantViewModel(eventParticipant);
         }
 
         public async Task UpdateIndividualParticipantAsync(Guid participantId, Guid eventId, AddIndividualParticipantDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+
+            var eventParticipant = await _eventParticipantRepository.GetByEventAndParticipantAsync(eventId, participantId);
+            if (eventParticipant == null || eventParticipant.Participant == null)
+            {
+                throw new ArgumentException("Participant registration not found.");
+            }
+
+            if (!(eventParticipant.Participant is IndividualParticipant individualParticipant))
+            {
+                throw new InvalidOperationException("Participant is not an individual.");
+            }
+
+            var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
+            if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
+
+            
+            
+            individualParticipant.FirstName = dto.FirstName;
+            individualParticipant.LastName = dto.LastName;
+            individualParticipant.PersonalIdCode = dto.PersonalIdCode;
+            await _participantRepository.UpdateAsync(individualParticipant);
+
+            
+            eventParticipant.PaymentMethodId = dto.PaymentMethodId;
+            eventParticipant.AdditionalInfo = dto.AdditionalInfo;
+            await _eventParticipantRepository.UpdateAsync(eventParticipant);
         }
 
         public async Task UpdateCompanyParticipantAsync(Guid participantId, Guid eventId, AddCompanyParticipantDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+
+            var eventParticipant = await _eventParticipantRepository.GetByEventAndParticipantAsync(eventId, participantId);
+            if (eventParticipant == null || eventParticipant.Participant == null)
+            {
+                throw new ArgumentException("Participant registration not found.");
+            }
+
+            if (!(eventParticipant.Participant is CompanyParticipant companyParticipant))
+            {
+                throw new InvalidOperationException("Participant is not a company.");
+            }
+            
+            var paymentMethodExists = await _paymentMethodRepository.GetByIdAsync(dto.PaymentMethodId);
+            if (paymentMethodExists == null) throw new ArgumentException("Payment method not found.", nameof(dto.PaymentMethodId));
+
+            
+            companyParticipant.LegalName = dto.LegalName;
+            companyParticipant.RegistryCode = dto.RegistryCode;
+            companyParticipant.NumberOfParticipants = dto.NumberOfParticipants; 
+            await _participantRepository.UpdateAsync(companyParticipant);
+
+            
+            eventParticipant.PaymentMethodId = dto.PaymentMethodId;
+            eventParticipant.AdditionalInfo = dto.AdditionalInfo;
+            await _eventParticipantRepository.UpdateAsync(eventParticipant);
         }
 
         public async Task DeleteParticipantAsync(Guid participantId, Guid eventId)
         {
-            throw new NotImplementedException();
+            var eventParticipant = await _eventParticipantRepository.GetByEventAndParticipantAsync(eventId, participantId);
+            if (eventParticipant == null)
+            {
+                
+                throw new ArgumentException("Participant registration not found.");
+            }
+
+            
+            
+            
+            if (eventParticipant.Id == Guid.Empty) { 
+                 throw new InvalidOperationException("EventParticipant Id is missing, cannot delete.");
+            }
+            await _eventParticipantRepository.DeleteAsync(eventParticipant.Id);
+
+            
+            
         }
 
         public async Task<IEnumerable<ParticipantViewModel>> GetParticipantsByEventAsync(Guid eventId)
         {
-            throw new NotImplementedException();
+            
+            var eventParticipants = await _eventParticipantRepository.GetByEventIdAsync(eventId);
+            return eventParticipants.Select(ep => MapToParticipantViewModel(ep)).ToList();
         }
 
         public async Task<IEnumerable<PaymentMethodViewModel>> GetPaymentMethodsAsync()
         {
-            throw new NotImplementedException();
+            var paymentMethods = await _paymentMethodRepository.GetAllAsync();
+            return paymentMethods.Select(pm => new PaymentMethodViewModel
+            {
+                Id = pm.Id,
+                Name = pm.Name
+            }).ToList();
         }
-        // ... other methods
+
+        
+        private ParticipantViewModel MapToParticipantViewModel(EventParticipant eventParticipant)
+        {
+            if (eventParticipant == null || eventParticipant.Participant == null || eventParticipant.PaymentMethod == null)
+            {
+                
+                
+                throw new InvalidOperationException("EventParticipant data is incomplete for mapping.");
+            }
+            
+            var viewModel = new ParticipantViewModel
+            {
+                
+                EventParticipantId = eventParticipant.Id, 
+                EventId = eventParticipant.EventId,
+                ParticipantId = eventParticipant.Participant.Id,
+                PaymentMethodId = eventParticipant.PaymentMethodId,
+                PaymentMethodName = eventParticipant.PaymentMethod.Name,
+                EventParticipantAdditionalInfo = eventParticipant.AdditionalInfo
+            };
+
+            if (eventParticipant.Participant is IndividualParticipant individual)
+            {
+                viewModel.ParticipantType = "Individual";
+                viewModel.FirstName = individual.FirstName;
+                viewModel.LastName = individual.LastName;
+                viewModel.PersonalIdCode = individual.PersonalIdCode;
+            }
+            else if (eventParticipant.Participant is CompanyParticipant company)
+            {
+                viewModel.ParticipantType = "Company";
+                viewModel.LegalName = company.LegalName;
+                viewModel.RegistryCode = company.RegistryCode;
+                viewModel.NumberOfParticipants = company.NumberOfParticipants;
+            }
+            
+
+            return viewModel;
+        }
     }
 }

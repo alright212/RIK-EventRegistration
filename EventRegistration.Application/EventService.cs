@@ -14,7 +14,7 @@ namespace EventRegistration.Application
 
         public async Task CreateEventAsync(CreateEventDto createEventDto)
         {
-            // Validation for AdditionalInfo length, EventTime is validated in Event constructor
+            
             if (createEventDto.AdditionalInfo?.Length > 1000)
             {
                  throw new ArgumentException("Additional info cannot exceed 1000 characters.", nameof(createEventDto.AdditionalInfo));
@@ -24,7 +24,7 @@ namespace EventRegistration.Application
                 createEventDto.Name,
                 createEventDto.EventTime,
                 createEventDto.Location,
-                createEventDto.AdditionalInfo ?? string.Empty // Ensure AdditionalInfo is not null for the constructor
+                createEventDto.AdditionalInfo ?? string.Empty 
             );
 
             await _eventRepository.AddAsync(newEvent);

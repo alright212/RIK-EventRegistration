@@ -6,7 +6,7 @@ namespace EventRegistration.Domain
     {
         public Guid Id { get; private set; }
         public string Name { get; private set; }
-        // Add other relevant properties for payment method, e.g., IsOnline, Description
+        
 
         public PaymentMethod(string name)
         {

@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic; // Required for ICollection
+using System.Collections.Generic; 
 
 namespace EventRegistration.Domain
 {
@@ -11,7 +11,7 @@ namespace EventRegistration.Domain
         public string Location { get; private set; }
         public string AdditionalInfo { get; private set; }
 
-        public ICollection<EventParticipant> EventParticipants { get; set; } // Added this line
+        public ICollection<EventParticipant> EventParticipants { get; set; } 
 
         public Event(string name, DateTime eventTime, string location, string additionalInfo)
         {
@@ -25,7 +25,7 @@ namespace EventRegistration.Domain
             EventTime = eventTime;
             Location = location;
             AdditionalInfo = additionalInfo;
-            EventParticipants = new HashSet<EventParticipant>(); // Initialize the collection
+            EventParticipants = new HashSet<EventParticipant>(); 
         }
     }
 }

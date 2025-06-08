@@ -16,9 +16,9 @@ namespace EventRegistration.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Event?> GetByIdAsync(Guid id) // Return type changed to nullable Event
+        public async Task<Event?> GetByIdAsync(Guid id) 
         {
-            return await _context.Events.Include(e => e.EventParticipants).FirstOrDefaultAsync(e => e.Id == id); // Added Include and changed to FirstOrDefaultAsync
+            return await _context.Events.Include(e => e.EventParticipants).FirstOrDefaultAsync(e => e.Id == id); 
         }
 
         public async Task<IEnumerable<Event>> GetAllAsync()
@@ -58,7 +58,7 @@ namespace EventRegistration.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Participant?> GetByIdAsync(Guid id) // Return type changed to nullable Participant
+        public async Task<Participant?> GetByIdAsync(Guid id) 
         {
             return await _context.Participants.FindAsync(id);
         }
@@ -68,7 +68,7 @@ namespace EventRegistration.Infrastructure.Repositories
             return await _context.EventParticipants
                 .Where(ep => ep.EventId == eventId)
                 .Select(ep => ep.Participant!)
-                .ToListAsync(); // Added null-forgiving operator as Participant should exist if EventParticipant exists
+                .ToListAsync(); 
         }
 
         public async Task AddAsync(Participant entity)
@@ -92,6 +92,20 @@ namespace EventRegistration.Infrastructure.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IndividualParticipant?> GetIndividualByPersonalIdCodeAsync(string personalIdCode)
+        {
+            return await _context.Participants
+                .OfType<IndividualParticipant>()
+                .FirstOrDefaultAsync(p => p.PersonalIdCode == personalIdCode);
+        }
+
+        public async Task<CompanyParticipant?> GetCompanyByRegistryCodeAsync(string registryCode)
+        {
+            return await _context.Participants
+                .OfType<CompanyParticipant>()
+                .FirstOrDefaultAsync(p => p.RegistryCode == registryCode);
+        }
     }
 
     public class PaymentMethodRepository : IPaymentMethodRepository
@@ -103,7 +117,7 @@ namespace EventRegistration.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<PaymentMethod?> GetByIdAsync(Guid id) // Return type changed to nullable PaymentMethod
+        public async Task<PaymentMethod?> GetByIdAsync(Guid id) 
         {
             return await _context.PaymentMethods.FindAsync(id);
         }
@@ -154,8 +168,8 @@ namespace EventRegistration.Infrastructure.Repositories
         {
             return await _context.EventParticipants
                 .Where(ep => ep.EventId == eventId)
-                .Include(ep => ep.Participant) // Include related Participant
-                .Include(ep => ep.PaymentMethod) // Include related PaymentMethod
+                .Include(ep => ep.Participant) 
+                .Include(ep => ep.PaymentMethod) 
                 .ToListAsync();
         }
 
@@ -179,6 +193,14 @@ namespace EventRegistration.Infrastructure.Repositories
                 _context.EventParticipants.Remove(entity);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<EventParticipant?> GetByEventAndParticipantAsync(Guid eventId, Guid participantId)
+        {
+            return await _context.EventParticipants
+                .Include(ep => ep.Participant)
+                .Include(ep => ep.PaymentMethod)
+                .FirstOrDefaultAsync(ep => ep.EventId == eventId && ep.ParticipantId == participantId);
         }
     }
 }

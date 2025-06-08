@@ -21,11 +21,11 @@ namespace EventRegistration.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure the composite primary key for the linking table
+            
             modelBuilder.Entity<EventParticipant>()
                 .HasKey(ep => new { ep.EventId, ep.ParticipantId });
 
-            // Configure the relationships
+            
             modelBuilder.Entity<EventParticipant>()
                 .HasOne(ep => ep.Event)
                 .WithMany(e => e.EventParticipants)
@@ -36,7 +36,7 @@ namespace EventRegistration.Infrastructure
                 .WithMany(p => p.EventParticipants)
                 .HasForeignKey(ep => ep.ParticipantId);
 
-            // Configure the TPH inheritance for Participant
+            
             modelBuilder.Entity<Participant>()
                 .HasDiscriminator<string>("ParticipantType")
                 .HasValue<IndividualParticipant>("Individual")
