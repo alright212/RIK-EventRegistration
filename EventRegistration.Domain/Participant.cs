@@ -1,16 +1,17 @@
 using System;
+using System.Collections.Generic; // Required for ICollection
 
 namespace EventRegistration.Domain
 {
     public abstract class Participant
     {
         public Guid Id { get; private set; }
-        public Guid EventId { get; private set; }
+        public ICollection<EventParticipant> EventParticipants { get; set; } // Added this line
 
-        protected Participant(Guid eventId)
+        protected Participant()
         {
             Id = Guid.NewGuid();
-            EventId = eventId;
+            EventParticipants = new HashSet<EventParticipant>(); // Initialize the collection
         }
     }
 
@@ -20,7 +21,7 @@ namespace EventRegistration.Domain
         public string LastName { get; private set; }
         public string PersonalIdCode { get; private set; }
 
-        public IndividualParticipant(Guid eventId, string firstName, string lastName, string personalIdCode) : base(eventId)
+        public IndividualParticipant(string firstName, string lastName, string personalIdCode) : base()
         {
             FirstName = firstName;
             LastName = lastName;
@@ -34,7 +35,7 @@ namespace EventRegistration.Domain
         public string RegistryCode { get; private set; }
         public int NumberOfParticipants { get; private set; }
 
-        public CompanyParticipant(Guid eventId, string legalName, string registryCode, int numberOfParticipants) : base(eventId)
+        public CompanyParticipant(string legalName, string registryCode, int numberOfParticipants) : base()
         {
             LegalName = legalName;
             RegistryCode = registryCode;

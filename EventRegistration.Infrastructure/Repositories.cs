@@ -65,7 +65,11 @@ namespace EventRegistration.Infrastructure.Repositories
 
         public async Task<IEnumerable<Participant>> GetByEventIdAsync(Guid eventId)
         {
-            return await _context.Participants.Where(p => p.EventId == eventId).ToListAsync();
+            // Updated to query through EventParticipants linking table
+            return await _context.EventParticipants
+                .Where(ep => ep.EventId == eventId)
+                .Select(ep => ep.Participant)
+                .ToListAsync();
         }
 
         public async Task AddAsync(Participant entity)

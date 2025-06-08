@@ -15,7 +15,7 @@ namespace EventRegistration.Domain
     public interface IParticipantRepository
     {
         Task<Participant> GetByIdAsync(Guid id);
-        Task<IEnumerable<Participant>> GetByEventIdAsync(Guid eventId);
+        Task<IEnumerable<Participant>> GetByEventIdAsync(Guid eventId); // This signature remains the same, but the implementation will change
         Task AddAsync(Participant entity);
         Task UpdateAsync(Participant entity);
         Task DeleteAsync(Guid id);

@@ -1,7 +1,27 @@
+using EventRegistration.Infrastructure;
+using EventRegistration.Infrastructure.Repositories;
+using EventRegistration.Domain;
+using EventRegistration.Application;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Configure DbContext with SQLite
+builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register your repositories and services
+// The framework will now 'inject' these wherever they are requested
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
+builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+// ... add other repositories
+
+builder.Services.AddScoped<IEventService, EventService>();
+// ... add other services
 
 var app = builder.Build();
 
