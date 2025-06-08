@@ -3,16 +3,21 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EventRegistration.Infrastructure;
 
 namespace EventRegistration.Application
 {
     public class EventService : IEventService
     {
         private readonly IEventRepository _eventRepository;
+        private readonly IParticipantRepository _participantRepository;
+        private readonly EventRegistrationDbContext _dbContext;
 
-        public EventService(IEventRepository eventRepository)
+        public EventService(IEventRepository eventRepository, IParticipantRepository participantRepository, EventRegistrationDbContext dbContext)
         {
             _eventRepository = eventRepository;
+            _participantRepository = participantRepository;
+            _dbContext = dbContext;
         }
 
         public async Task CreateEventAsync(CreateEventDto createEventDto)
