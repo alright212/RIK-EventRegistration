@@ -1,17 +1,8 @@
-﻿@{
+﻿@using EventRegistration.Application // Added to access EventViewModel
+@{
     ViewData["Title"] = "Avaleht";
-    // Dummy data for events - replace with actual data from your ViewModel
-    // You would typically pass this data from your HomeController's Index action
-    var futureEvents = new List<dynamic>
-    {
-        new { Id = Guid.NewGuid(), Name = "Konverents \"Innovatsioon 2025\"", EventTime = new DateTime(2025, 10, 15) },
-        new { Id = Guid.NewGuid(), Name = "Muusikafestival \"Suveheli\"", EventTime = new DateTime(2025, 7, 22) }
-    };
-    var pastEvents = new List<dynamic>
-    {
-        new { Id = Guid.NewGuid(), Name = "Kunstinäitus \"Värvide Mäng\"", EventTime = new DateTime(2025, 4, 5) },
-        new { Id = Guid.NewGuid(), Name = "Spordivõistlus \"Kevadspartakiaad\"", EventTime = new DateTime(2025, 5, 20) }
-    };
+    var futureEvents = ViewBag.FutureEvents as IEnumerable<EventViewModel> ?? new List<EventViewModel>();
+    var pastEvents = ViewBag.PastEvents as IEnumerable<EventViewModel> ?? new List<EventViewModel>();
 }
 
 <div class="container mt-4 mb-4">
@@ -33,56 +24,68 @@
     <!-- Bottom section: Event Lists -->
     <div class="row">
         <div class="col-md-6">
-            <h2 class="event-list-header border-bottom pb-2 mb-3">Tulevased üritused</h2>
-            @if (futureEvents.Any())
-            {
-                <ul class="list-unstyled">
-                    @foreach (var ev in futureEvents)
-                    {
-                        <li class="event-item mb-3 p-3 border rounded shadow-sm">
-                            <div class="event-item-info">
-                                <strong>@ev.Name</strong>
-                                <span>@ev.EventTime.ToString("dd.MM.yyyy")</span>
-                            </div>
-                            <div class="event-item-actions mt-2 mt-md-0">
-                                <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-primary">Osavõtjad</a>
-                                <a href="#" class="btn btn-sm btn-outline-danger" title="Kustuta üritus">
-                                    <img src="~/images/remove.png" alt="Kustuta" style="height: 16px; vertical-align: middle;" />
-                                </a>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p>Tulevasi üritusi ei leitud.</p>
-            }
+            <div class="events-list">
+                <h2>Tulevased üritused</h2>
+                @if (futureEvents.Any())
+                {
+                    <ul>
+                        @foreach (var ev in futureEvents)
+                        {
+                            <li>
+                                <div class="event-date-box">
+                                    <span class="event-day">@ev.EventTime.ToString("dd")</span>
+                                    <span class="event-month">@ev.EventTime.ToString("MMM").ToUpper()</span>
+                                </div>
+                                <div class="event-info">
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="event-name">@ev.Name</a>
+                                    <p class="event-location">@ev.Location</p>
+                                    <p class="event-participants">Osavõtjaid: @ev.ParticipantCount</p>
+                                </div>
+                                <div class="event-actions">
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id">Osavõtjad</a>
+                                    <a href="#" class="delete-icon"><img src="~/images/remove.png" alt="Kustuta" /></a>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>Tulevasi üritusi hetkel ei ole.</p>
+                }
+            </div>
         </div>
 
         <div class="col-md-6">
-            <h2 class="event-list-header border-bottom pb-2 mb-3">Toimunud üritused</h2>
-            @if (pastEvents.Any())
-            {
-                <ul class="list-unstyled">
-                    @foreach (var ev in pastEvents)
-                    {
-                        <li class="event-item mb-3 p-3 border rounded shadow-sm">
-                            <div class="event-item-info">
-                                <strong>@ev.Name</strong>
-                                <span>@ev.EventTime.ToString("dd.MM.yyyy")</span>
-                            </div>
-                            <div class="event-item-actions mt-2 mt-md-0">
-                                <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-secondary">Osavõtjad</a>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p>Toimunud üritusi ei leitud.</p>
-            }
+            <div class="events-list">
+                <h2>Toimunud üritused</h2>
+                @if (pastEvents.Any())
+                {
+                    <ul>
+                        @foreach (var ev in pastEvents)
+                        {
+                            <li>
+                                <div class="event-date-box">
+                                    <span class="event-day">@ev.EventTime.ToString("dd")</span>
+                                    <span class="event-month">@ev.EventTime.ToString("MMM").ToUpper()</span>
+                                </div>
+                                <div class="event-info">
+                                    <span class="event-name">@ev.Name</span> @* Past events are not clickable to details in the same way by default, adjust if needed *@
+                                    <p class="event-location">@ev.Location</p>
+                                    <p class="event-participants">Osavõtjaid: @ev.ParticipantCount</p>
+                                </div>
+                                <div class="event-actions">
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id">Osavõtjad</a>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>Toimunud üritusi hetkel ei ole.</p>
+                }
+            </div>
         </div>
     </div>
 </div>
