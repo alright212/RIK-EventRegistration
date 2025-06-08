@@ -42,6 +42,12 @@ namespace EventRegistration.Infrastructure
                 .HasDiscriminator<string>("ParticipantType")
                 .HasValue<IndividualParticipant>("Individual")
                 .HasValue<CompanyParticipant>("Company");
+
+            // Seed data for PaymentMethods
+            modelBuilder.Entity<PaymentMethod>().HasData(
+                new { Id = 1, Name = "Sularaha" },
+                new { Id = 2, Name = "Pangaülekanne" }
+            );
         }
     }
 }

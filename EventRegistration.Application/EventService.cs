@@ -78,6 +78,8 @@ namespace EventRegistration.Application
                 return null;
             }
 
+            var participants = eventEntity.Participants?.Select(ep => MapToParticipantViewModel(ep)).ToList() ?? new List<ParticipantViewModel>();
+
             return new EventDetailViewModel
             {
                 Event = new EventViewModel
@@ -87,9 +89,9 @@ namespace EventRegistration.Application
                     EventTime = eventEntity.Time,
                     Location = eventEntity.Location,
                     AdditionalInfo = eventEntity.AdditionalInfo,
-                    ParticipantCount = eventEntity.Participants?.Count ?? 0
+                    ParticipantCount = participants.Count
                 },
-                Participants = eventEntity.Participants?.Select(ep => new ParticipantViewModel { /* map properties */ }) ?? new List<ParticipantViewModel>()
+                Participants = participants
             };
         }
         
@@ -142,6 +144,40 @@ namespace EventRegistration.Application
             }
             
             await _eventRepository.RemoveAsync(eventToDelete);
+        }
+
+        private ParticipantViewModel MapToParticipantViewModel(EventParticipant eventParticipant)
+        {
+            if (eventParticipant == null || eventParticipant.Participant == null)
+            {
+                throw new InvalidOperationException("EventParticipant data is incomplete for mapping.");
+            }
+            
+            var viewModel = new ParticipantViewModel
+            {
+                EventId = eventParticipant.EventId,
+                ParticipantId = eventParticipant.Participant.Id,
+                PaymentMethodId = eventParticipant.PaymentMethodId,
+                PaymentMethodName = eventParticipant.PaymentMethod?.Name ?? "Unknown",
+                EventParticipantAdditionalInfo = eventParticipant.AdditionalInfo
+            };
+
+            if (eventParticipant.Participant is IndividualParticipant individual)
+            {
+                viewModel.ParticipantType = "Individual";
+                viewModel.FirstName = individual.FirstName;
+                viewModel.LastName = individual.LastName;
+                viewModel.PersonalIdCode = individual.PersonalIdCode;
+            }
+            else if (eventParticipant.Participant is CompanyParticipant company)
+            {
+                viewModel.ParticipantType = "Company";
+                viewModel.LegalName = company.LegalName;
+                viewModel.RegistryCode = company.RegistryCode;
+                viewModel.NumberOfParticipants = company.NumberOfParticipants;
+            }
+
+            return viewModel;
         }
     }
 }

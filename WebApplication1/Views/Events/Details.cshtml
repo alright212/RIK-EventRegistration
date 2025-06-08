@@ -1,28 +1,22 @@
-@model EventRegistration.Application.EventViewModel
+@using System.Linq
+@model EventRegistration.Application.EventDetailViewModel
 @{
     ViewData["Title"] = "Osavõtjad";
-    // Dummy data for participants - replace with real data later
-    var participants = new List<object> // Replace 'object' with your ParticipantViewModel
-    {
-        new { Id = Guid.NewGuid(), Name = "Mari Maasikas", Code = "38903030000", Type = "Eraisik" },
-        new { Id = Guid.NewGuid(), Name = "Karu AS", Code = "12345678", Type = "Ettevõte", ParticipantCount = 5 },
-        new { Id = Guid.NewGuid(), Name = "Jänes Juta", Code = "49001010000", Type = "Eraisik" },
-    };
 }
 
 <div class="breadcrumb">
-    <span>Avaleht</span> &gt; <span>@Model.Name</span> &gt; <span>Osavõtjad</span>
+    <span>Avaleht</span> &gt; <span>@Model.Event.Name</span> &gt; <span>Osavõtjad</span>
 </div>
 
 <div class="event-details-header">
-    <h1>@Model.Name</h1>
+    <h1>@Model.Event.Name</h1>
     <div class="event-meta">
-        <span>Toimumisaeg: @Model.EventTime.ToString("dd.MM.yyyy HH:mm")</span>
-        <span>Koht: @Model.Location</span>
+        <span>Toimumisaeg: @Model.Event.EventTime.ToString("dd.MM.yyyy HH:mm")</span>
+        <span>Koht: @Model.Event.Location</span>
     </div>
 </div>
 
-<h2>Osavõtjad (@Model.ParticipantCount)</h2>
+<h2>Osavõtjad (@Model.Participants.Count())</h2>
 
 <table class="table participants-table">
     <thead>
@@ -33,15 +27,45 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var p in participants) // Replace with real participant data and model
+        @if (Model.Participants != null && Model.Participants.Any())
+        {
+            @foreach (var participant in Model.Participants)
+            {
+                <tr>
+                    <td>
+                        @if (participant.ParticipantType == "Individual")
+                        {
+                            <text>@participant.FirstName @participant.LastName</text>
+                        }
+                        else
+                        {
+                            <text>@participant.LegalName</text>
+                        }
+                    </td>
+                    <td>
+                        @if (participant.ParticipantType == "Individual")
+                        {
+                            <text>@participant.PersonalIdCode</text>
+                        }
+                        else
+                        {
+                            <text>@participant.RegistryCode</text>
+                        }
+                    </td>
+                    <td>
+                        <a asp-controller="Participants" asp-action="Details" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" class="btn btn-sm btn-outline-primary">VAATA</a>
+                        <form asp-controller="Participants" asp-action="Delete" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" method="post" style="display: inline-block;" onsubmit="return confirm('Kas olete kindel, et soovite selle osavõtja kustutada?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger">KUSTUTA</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td>@p.GetType().GetProperty("Name")?.GetValue(p, null)</td>
-                <td>@p.GetType().GetProperty("Code")?.GetValue(p, null)</td>
-                <td>
-                    <a asp-controller="Participants" asp-action="Edit" asp-route-id="@p.GetType().GetProperty("Id")?.GetValue(p, null)" class="btn btn-sm btn-outline-primary">VAATA</a>
-                    <a href="#" class="btn btn-sm btn-outline-danger">KUSTUTA</a> @* Implement delete later *@
-                </td>
+                <td colspan="3" class="text-center text-gray-500 py-4">Osavõtjaid ei ole veel lisatud</td>
             </tr>
         }
     </tbody>
@@ -51,93 +75,8 @@
 
 <h2>Lisa osavõtja</h2>
 <div class="add-participant-form">
-    <div class="participant-type-selector">
-        <button type="button" id="btnToggleIndividual" class="btn btn-tab active">Eraisik</button>
-        <button type="button" id="btnToggleCompany" class="btn btn-tab">Ettevõte</button>
-    </div>
-
-    <form id="formIndividualParticipant" asp-action="AddIndividualParticipant" asp-route-eventId="@Model.Id"> @* TODO: Define this action *@
-        <h4>Eraisik</h4>
-        <div class="form-group">
-            <label>Eesnimi:</label>
-            <input type="text" name="FirstName" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Perekonnanimi:</label>
-            <input type="text" name="LastName" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Isikukood:</label>
-            <input type="text" name="PersonalIdCode" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Makseviis:</label>
-            <select name="PaymentMethodId" class="form-control">
-                <option value="">Vali makseviis</option>
-                @* TODO: Populate with real payment methods *@
-                <option value="cash">Sularaha</option>
-                <option value="banklink">Pangalink</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Lisainfo:</label>
-            <textarea name="AdditionalInfo" class="form-control" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Lisa</button>
-    </form>
-
-    <form id="formCompanyParticipant" asp-action="AddCompanyParticipant" asp-route-eventId="@Model.Id" style="display:none;"> @* TODO: Define this action *@
-        <h4>Ettevõte</h4>
-        <div class="form-group">
-            <label>Juriidiline nimi:</label>
-            <input type="text" name="LegalName" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Registrikood:</label>
-            <input type="text" name="RegistryCode" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Osavõtjate arv:</label>
-            <input type="number" name="NumberOfParticipants" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Makseviis:</label>
-            <select name="PaymentMethodId" class="form-control">
-                <option value="">Vali makseviis</option>
-                @* TODO: Populate with real payment methods *@
-                <option value="cash">Sularaha</option>
-                <option value="banklink">Pangalink</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Lisainfo:</label>
-            <textarea name="AdditionalInfo" class="form-control" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Lisa</button>
-    </form>
+    <a asp-controller="Participants" asp-action="Add" asp-route-eventId="@Model.Event.Id" class="btn btn-primary">Lisa uus osavõtja</a>
 </div>
-
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const btnIndividual = document.getElementById('btnToggleIndividual');
-            const btnCompany = document.getElementById('btnToggleCompany');
-            const formIndividual = document.getElementById('formIndividualParticipant');
-            const formCompany = document.getElementById('formCompanyParticipant');
-
-            btnIndividual.addEventListener('click', function () {
-                formIndividual.style.display = 'block';
-                formCompany.style.display = 'none';
-                btnIndividual.classList.add('active');
-                btnCompany.classList.remove('active');
-            });
-
-            btnCompany.addEventListener('click', function () {
-                formIndividual.style.display = 'none';
-                formCompany.style.display = 'block';
-                btnCompany.classList.add('active');
-                btnIndividual.classList.remove('active');
-            });
-        });
-    </script>
+    @* Scripts removed as inline forms are replaced with dedicated Add view *@
 }

@@ -17,10 +17,10 @@ builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
-// ... add other repositories
+builder.Services.AddScoped<IEventParticipantRepository, EventParticipantRepository>();
 
 builder.Services.AddScoped<IEventService, EventService>();
-// ... add other services
+builder.Services.AddScoped<IParticipantService, ParticipantService>();
 
 var app = builder.Build();
 
