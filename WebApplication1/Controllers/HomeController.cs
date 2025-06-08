@@ -1,41 +1,43 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Models; // Assuming ErrorViewModel is here
-using EventRegistration.Application; // Added for IEventService
-using System.Threading.Tasks; // Added for Task
+using WebApplication1.Models;
+using EventRegistration.Application;
+using System.Threading.Tasks;
 
-namespace WebApplication1.Controllers;
-
-public class HomeController : Controller
+namespace WebApplication1.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-    private readonly IEventService _eventService; // Added
-
-    public HomeController(ILogger<HomeController> logger, IEventService eventService) // Modified constructor
+    public class HomeController : Controller
     {
-        _logger = logger;
-        _eventService = eventService; // Added
-    }
+        private readonly ILogger<HomeController> _logger;
+        private readonly IEventService _eventService;
 
-    public async Task<IActionResult> Index() // Made async
-    {
-        var futureEvents = await _eventService.GetFutureEventsAsync();
-        var pastEvents = await _eventService.GetPastEventsAsync();
+        public HomeController(ILogger<HomeController> logger, IEventService eventService)
+        {
+            _logger = logger;
+            _eventService = eventService;
+        }
 
-        ViewBag.FutureEvents = futureEvents;
-        ViewBag.PastEvents = pastEvents;
+        public async Task<IActionResult> Index()
+        {
+            // FIX: Corrected method names to match the IEventService interface.
+            var futureEvents = await _eventService.GetUpcomingEvents();
+            var pastEvents = await _eventService.GetPastEvents();
 
-        return View();
-    }
+            ViewBag.FutureEvents = futureEvents;
+            ViewBag.PastEvents = pastEvents;
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+            return View();
+        }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 }

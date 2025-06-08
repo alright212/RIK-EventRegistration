@@ -26,7 +26,7 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
-            var eventDetails = await _eventService.GetEventDetail(eventId); // Changed from GetEventDetailsAsync to GetEventDetail
+            var eventDetails = await _eventService.GetEventDetail(eventId);
             if (eventDetails == null)
             {
                 return NotFound();
@@ -37,7 +37,7 @@ namespace WebApplication1.Controllers
             var viewModel = new AddOrEditParticipantViewModel
             {
                 EventId = eventId,
-                EventName = eventDetails.Event.Name, // Access Name via eventDetails.Event.Name
+                EventName = eventDetails.Event.Name,
                 PaymentMethods = paymentMethods.Select(p => new SelectListItem(p.Name, p.Id.ToString())).ToList(),
                 Individual = new AddIndividualParticipantDto { EventId = eventId },
                 Company = new AddCompanyParticipantDto { EventId = eventId }
@@ -51,8 +51,6 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(AddOrEditParticipantViewModel viewModel)
         {
-            // We manually clear model state errors for the participant type that wasn't selected
-            // to ensure validation passes for the submitted form half.
             ModelState.Clear(); 
             
             if (viewModel.ParticipantType == "Individual")
@@ -73,11 +71,10 @@ namespace WebApplication1.Controllers
                     return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
                 }
             }
-
-            // If we get here, something failed. Repopulate the necessary view data and return the view.
-            var eventDetails = await _eventService.GetEventDetail(viewModel.EventId); // Changed from GetEventDetailsAsync to GetEventDetail
+            
+            var eventDetails = await _eventService.GetEventDetail(viewModel.EventId);
             var paymentMethods = await _participantService.GetPaymentMethodsAsync();
-            viewModel.EventName = eventDetails?.Event?.Name ?? "Event"; // Access Name via eventDetails.Event.Name
+            viewModel.EventName = eventDetails?.Event?.Name ?? "Event";
             viewModel.PaymentMethods = paymentMethods.Select(p => new SelectListItem(p.Name, p.Id.ToString())).ToList();
 
             return View(viewModel);
@@ -86,20 +83,18 @@ namespace WebApplication1.Controllers
         // POST: Participants/Delete/{eventId}/{participantId}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(Guid eventId, Guid participantId)
+        // FIX: Changed participantId from Guid to int to match the service layer.
+        public async Task<IActionResult> Delete(Guid eventId, int participantId)
         {
-            if (eventId == Guid.Empty || participantId == Guid.Empty)
+            if (eventId == Guid.Empty)
             {
                 return NotFound();
             }
-
+            
+            // The participantId is now correctly passed as an int.
             await _participantService.DeleteParticipantAsync(participantId, eventId);
 
             return RedirectToAction("Details", "Events", new { id = eventId });
         }
-
-        // NOTE: The Edit actions would be implemented here as well. They would be similar to Add,
-        // but would first fetch the participant's data to pre-populate the ViewModel.
-        // For brevity, these are left as the next implementation step.
     }
 }

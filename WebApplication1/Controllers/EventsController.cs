@@ -29,8 +29,9 @@ namespace WebApplication1.Controllers
             {
                 try
                 {
-                    await _eventService.CreateEventAsync(createEventDto);
-                    return RedirectToAction("Index", "Home"); // Or to a success page, or event details
+                    // FIX: Corrected method name to match the IEventService interface.
+                    await _eventService.CreateEvent(createEventDto);
+                    return RedirectToAction("Index", "Home");
                 }
                 catch (ArgumentException ex)
                 {
@@ -48,15 +49,15 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
-            var eventDetails = await _eventService.GetEventDetailsAsync(id);
+            // FIX: Corrected method name to match the IEventService interface.
+            var eventDetails = await _eventService.GetEventDetail(id);
             if (eventDetails == null)
             {
                 return NotFound();
             }
-
-            // For now, we'll pass the EventViewModel. Later we might need a more specific ViewModel for this page.
-            // We also need to fetch participants for this event. This will be added later.
-            ViewBag.EventName = eventDetails.Name; // For the breadcrumb/title
+            
+            // FIX: The view model for details is EventDetailViewModel, which contains the event info.
+            ViewBag.EventName = eventDetails.Event.Name;
             return View(eventDetails);
         }
     }

@@ -1,5 +1,4 @@
 using EventRegistration.Infrastructure;
-using EventRegistration.Infrastructure.Repositories;
 using EventRegistration.Domain;
 using EventRegistration.Application;
 using Microsoft.EntityFrameworkCore;
