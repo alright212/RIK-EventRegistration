@@ -25,12 +25,10 @@
             background-color: #373737;
         }
         .event-item {
-            border-bottom: 1px solid #e5e7eb;
+            /* border-bottom: 1px solid #e5e7eb; <-- This line has been removed */
             padding: 1rem 0;
         }
-        .event-item:last-child {
-            border-bottom: none;
-        }
+        /* The :last-child rule is no longer necessary and has been removed. */
         .event-card {
             background-color: #ffffff;
         }
@@ -43,19 +41,32 @@
 </head>
 <body class="text-gray-700">
 
-    <div class="max-w-6xl mx-auto bg-white shadow-lg">
+    <div class="max-w-6xl mx-auto">
 
-        <header class="header-bg">
+        <header class="header-bg shadow-lg">
             <div class="container mx-auto px-6 py-3 flex justify-between items-center">
                 <div class="flex items-center space-x-8">
                     <div class="logo-box font-black text-xl">
                         NULLAM
                     </div>
+                    
                     <nav class="flex items-center text-sm font-bold h-full">
-                        <a asp-controller="Home" asp-action="Index" class="main-blue-bg text-white px-4 py-2">AVALEHT</a>
-                        <a asp-controller="Events" asp-action="Create" class="text-gray-600 hover:text-blue-600 px-4 py-2">ÜRITUSE LISAMINE</a>
+                        @{
+                            var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                            var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                        }
+                        
+                        <a asp-controller="Home" asp-action="Index" 
+                           class="px-4 py-2 @(currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600")">
+                           AVALEHT
+                        </a>
+                        
+                        <a asp-controller="Events" asp-action="Create" 
+                           class="px-4 py-2 @(currentController.Equals("Events", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Create", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600")">
+                           ÜRITUSE LISAMINE
+                        </a>
                     </nav>
-                </div>
+                    </div>
                 <div class="flex items-center">
                     <div class="w-10 h-10 border-2 border-blue-600 rounded-full flex items-center justify-center">
                         <span class="text-blue-600 font-bold text-xl">¥</span>
@@ -64,11 +75,11 @@
             </div>
         </header>
 
-        <main>
+        <main class="mt-[30px] bg-white shadow-lg">
             @RenderBody()
         </main>
 
-        <footer class="footer-bg text-white p-8 md:p-12">
+        <footer class="footer-bg text-white p-8 md:p-12 mt-[30px] shadow-lg">
             <div class="container mx-auto grid sm:grid-cols-2 md:grid-cols-4 gap-8">
                 <div>
                     <h3 class="font-bold text-lg mb-4">Curabitur</h3>

@@ -3,56 +3,52 @@
     ViewData["Title"] = "Ürituse lisamine";
 }
 
-<div class="event-creation-banner">
-    <div class="banner-image-container">
-        <img src="~/images/libled.png" alt="Ürituse lisamise päis" class="banner-image" />
-    </div>
-    <div class="banner-title">
-        <h1>Ürituse lisamine</h1>
+<!-- I've adjusted the height of this header section from h-32 to h-24 -->
+<div class="flex mb-8 h-20">
+    <div class="flex w-full">
+        <div class="w-1/3 main-blue-bg text-white flex items-center p-3 sm:p-4">
+            <h1 class="text-xl sm:text-2xl font-bold m-0">@ViewData["Title"]</h1>
+        </div>
+        <div class="w-2/3">
+            <img src="~/images/libled.png" alt="Ürituse lisamise päis" class="w-full h-full object-cover" />
+        </div>
     </div>
 </div>
 
-<div class="form-container">
-    <form asp-action="Create" class="event-form">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="form-group row">
-            <label asp-for="Name" class="col-sm-3 col-form-label">Ürituse nimi:</label>
-            <div class="col-sm-9">
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+<div class="bg-white p-6 sm:p-8 border border-gray-300 shadow-md rounded-md">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4"></div>
+        <div class="sm:flex sm:items-baseline mb-6">
+            <label asp-for="Name" class="block text-sm font-medium text-gray-700 sm:w-1/4 sm:text-right sm:pr-4">Ürituse nimi:</label>
+            <div class="mt-1 sm:mt-0 sm:w-3/4">
+                <input asp-for="Name" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <span asp-validation-for="Name" class="text-red-600 text-sm mt-1 block"></span>
             </div>
         </div>
-
-        <div class="form-group row">
-            <label asp-for="EventTime" class="col-sm-3 col-form-label">Toimumisaeg:</label>
-            <div class="col-sm-9">
-                @* Muudetud 'datetime-local' 'text'-iks ja lisatud placeholder *@
-                <input asp-for="EventTime" type="text" class="form-control" placeholder="pp.kk.aaaa hh:mm" />
-                <span asp-validation-for="EventTime" class="text-danger"></span>
+        <div class="sm:flex sm:items-baseline mb-6">
+            <label asp-for="EventTime" class="block text-sm font-medium text-gray-700 sm:w-1/4 sm:text-right sm:pr-4">Toimumisaeg:</label>
+            <div class="mt-1 sm:mt-0 sm:w-3/4">
+                <input asp-for="EventTime" type="text" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="pp.kk.aaaa hh:mm" />
+                <span asp-validation-for="EventTime" class="text-red-600 text-sm mt-1 block"></span>
             </div>
         </div>
-
-        <div class="form-group row">
-            <label asp-for="Location" class="col-sm-3 col-form-label">Koht:</label>
-            <div class="col-sm-9">
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
+        <div class="sm:flex sm:items-baseline mb-6">
+            <label asp-for="Location" class="block text-sm font-medium text-gray-700 sm:w-1/4 sm:text-right sm:pr-4">Koht:</label>
+            <div class="mt-1 sm:mt-0 sm:w-3/4">
+                <input asp-for="Location" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                <span asp-validation-for="Location" class="text-red-600 text-sm mt-1 block"></span>
             </div>
         </div>
-
-        <div class="form-group row">
-            <label asp-for="AdditionalInfo" class="col-sm-3 col-form-label">Lisainfo:</label>
-            <div class="col-sm-9">
-                <textarea asp-for="AdditionalInfo" class="form-control" rows="4"></textarea>
-                <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
+        <div class="sm:flex sm:items-baseline mb-6">
+            <label asp-for="AdditionalInfo" class="block text-sm font-medium text-gray-700 sm:w-1/4 sm:text-right sm:pr-4">Lisainfo:</label>
+            <div class="mt-1 sm:mt-0 sm:w-3/4">
+                <textarea asp-for="AdditionalInfo" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" rows="4"></textarea>
+                <span asp-validation-for="AdditionalInfo" class="text-red-600 text-sm mt-1 block"></span>
             </div>
         </div>
-
-        <div class="form-actions">
-            @* Nuppude järjestus ja tekst muudetud vastavalt pildile *@
-            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Tagasi</a>
-            <button type="submit" class="btn btn-primary">Lisa</button>
+        <div class="flex flex-col sm:flex-row sm:justify-start gap-3 mt-8 pt-6 border-t border-gray-300">
+            <a asp-controller="Home" asp-action="Index" class="w-full sm:w-auto px-4 py-2 text-center border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Tagasi</a>
+            <button type="submit" class="w-full sm:w-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white main-blue-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Lisa</button>
         </div>
     </form>
 </div>
