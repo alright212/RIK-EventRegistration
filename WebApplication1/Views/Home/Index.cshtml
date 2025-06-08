@@ -1,49 +1,44 @@
-﻿@using EventRegistration.Application // Added to access EventViewModel
+﻿@using EventRegistration.Application
 @{
     ViewData["Title"] = "Avaleht";
     var futureEvents = ViewBag.FutureEvents as IEnumerable<EventViewModel> ?? new List<EventViewModel>();
     var pastEvents = ViewBag.PastEvents as IEnumerable<EventViewModel> ?? new List<EventViewModel>();
 }
 
-<div class="container mt-4 mb-4">
-    <!-- Top section: Info box and Image -->
-    <div class="row mb-5 align-items-center">
-        <div class="col-md-7">
-            <div class="homepage-info-box p-4">
-                <h1>Tere tulemast ürituste lehele!</h1>
-                <p class="lead">Avasta põnevaid sündmusi ja halda oma osavõtte lihtsalt ja mugavalt.</p>
-                <p>Siit leiad nii tulevasi kui ka juba toimunud üritusi. Loo uusi sündmusi, kutsu osalejaid ja pea järge kõige olulisema üle. Meie platvorm on loodud selleks, et ürituste korraldamine oleks sujuv ja nauditav kogemus.</p>
-                <p>Kasuta navigeerimisriba, et lisada uus üritus või sirvida olemasolevaid. Küsimuste korral võta meiega julgelt ühendust!</p>
-            </div>
-        </div>
-        <div class="col-md-5">
-            <img src="~/images/pilt.jpg" alt="Ürituse illustratsioon" class="img-fluid rounded shadow-sm" />
-        </div>
+<section class="grid md:grid-cols-2">
+    <div class="main-blue-bg text-white p-8 md:p-12 flex flex-col justify-center">
+        <h1 class="text-3xl font-bold mb-4">Tere tulemast ürituste lehele!</h1>
+        <p class="text-lg leading-relaxed">
+             Avasta põnevaid sündmusi ja halda oma osavõtte lihtsalt ja mugavalt.
+        </p>
+        <p class="mt-4 text-base leading-relaxed">
+            Siit leiad nii tulevasi kui ka juba toimunud üritusi. Loo uusi sündmusi, kutsu osalejaid ja pea järge kõige olulisema üle.
+        </p>
     </div>
+    <div>
+        <img src="@Url.Content("~/images/pilt.png")" alt="Ürituse illustratsioon" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/a0aec0/ffffff?text=Image';">
+    </div>
+</section>
 
-    <!-- Bottom section: Event Lists -->
-    <div class="row">
-        <div class="col-md-6">
-            <div class="events-list">
-                <h2>Tulevased üritused</h2>
+<section class="bg-gray-100 p-8 md:p-12">
+    <div class="grid md:grid-cols-2 gap-12">
+
+        <div class="event-card shadow-md rounded-md overflow-hidden">
+            <h2 class="main-blue-bg text-white text-xl font-bold p-4">Tulevased üritused</h2>
+            <div class="p-6">
                 @if (futureEvents.Any())
                 {
                     <ul>
                         @foreach (var ev in futureEvents)
                         {
-                            <li>
-                                <div class="event-date-box">
-                                    <span class="event-day">@ev.EventTime.ToString("dd")</span>
-                                    <span class="event-month">@ev.EventTime.ToString("MMM").ToUpper()</span>
+                            <li class="event-item flex justify-between items-center">
+                                <div>
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="font-bold text-gray-800 hover:text-blue-600">@ev.Name</a>
+                                    <p class="text-sm text-gray-500 mt-1">@ev.Location</p>
                                 </div>
-                                <div class="event-info">
-                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="event-name">@ev.Name</a>
-                                    <p class="event-location">@ev.Location</p>
-                                    <p class="event-participants">Osavõtjaid: @ev.ParticipantCount</p>
-                                </div>
-                                <div class="event-actions">
-                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id">Osavõtjad</a>
-                                    <a href="#" class="delete-icon"><img src="~/images/remove.png" alt="Kustuta" /></a>
+                                <div class="text-right flex items-center space-x-4">
+                                    <p class="text-sm font-semibold">@ev.EventTime.ToString("dd.MM.yyyy")</p>
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="text-xs font-bold text-gray-500 hover:text-blue-600">OSAVÕTJAD (@ev.ParticipantCount)</a>
                                 </div>
                             </li>
                         }
@@ -53,29 +48,28 @@
                 {
                     <p>Tulevasi üritusi hetkel ei ole.</p>
                 }
+                <div class="mt-8">
+                    <a asp-controller="Events" asp-action="Create" class="font-bold text-sm text-gray-600 hover:text-blue-700 uppercase">LISA UUS ÜRITUS</a>
+                </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="events-list">
-                <h2>Toimunud üritused</h2>
+        <div class="event-card shadow-md rounded-md overflow-hidden">
+            <h2 class="main-blue-bg text-white text-xl font-bold p-4">Toimunud üritused</h2>
+            <div class="p-6">
                 @if (pastEvents.Any())
                 {
                     <ul>
                         @foreach (var ev in pastEvents)
                         {
-                            <li>
-                                <div class="event-date-box">
-                                    <span class="event-day">@ev.EventTime.ToString("dd")</span>
-                                    <span class="event-month">@ev.EventTime.ToString("MMM").ToUpper()</span>
+                            <li class="event-item flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-gray-800">@ev.Name</p>
+                                    <p class="text-sm text-gray-500 mt-1">@ev.Location</p>
                                 </div>
-                                <div class="event-info">
-                                    <span class="event-name">@ev.Name</span> @* Past events are not clickable to details in the same way by default, adjust if needed *@
-                                    <p class="event-location">@ev.Location</p>
-                                    <p class="event-participants">Osavõtjaid: @ev.ParticipantCount</p>
-                                </div>
-                                <div class="event-actions">
-                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id">Osavõtjad</a>
+                                <div class="text-right flex items-center space-x-4">
+                                    <p class="text-sm font-semibold">@ev.EventTime.ToString("dd.MM.yyyy")</p>
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="text-xs font-bold text-gray-500 hover:text-blue-600">OSAVÕTJAD (@ev.ParticipantCount)</a>
                                 </div>
                             </li>
                         }
@@ -87,5 +81,6 @@
                 }
             </div>
         </div>
+
     </div>
-</div>
+</section>

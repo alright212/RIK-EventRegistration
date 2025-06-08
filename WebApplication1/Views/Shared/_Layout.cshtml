@@ -1,73 +1,114 @@
 ﻿<!DOCTYPE html>
 <html lang="et">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Ürituste Korraldamine</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Üritused</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to match the design */
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f0f2f5; /* Light gray background for the whole page */
+        }
+        .header-bg {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .main-blue-bg {
+            background-color: #2a5a8a;
+        }
+        .footer-bg {
+            background-color: #373737;
+        }
+        .event-item {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 0;
+        }
+        .event-item:last-child {
+            border-bottom: none;
+        }
+        .event-card {
+            background-color: #ffffff;
+        }
+        .logo-box {
+            border: 2px solid #2a5a8a;
+            padding: 0.5rem 1rem;
+            color: #2a5a8a;
+        }
+    </style>
 </head>
-<body>
-    <header class="site-header navbar navbar-expand-lg navbar-light fixed-top">
-        <div class="container">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <img src="~/images/logo.png" alt="NULLAM Logo" />
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">AVALEHT</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Events" asp-action="Create">ÜRITUSE LISAMINE</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <img src="~/images/symbol.png" alt="Symbol" style="max-height: 30px;" />
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </header>
+<body class="text-gray-700">
 
-    <div class="container main-content" id="content-wrap">
-        <main role="main" class="pb-3">
+    <div class="max-w-6xl mx-auto bg-white shadow-lg">
+
+        <header class="header-bg">
+            <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-8">
+                    <div class="logo-box font-black text-xl">
+                        NULLAM
+                    </div>
+                    <nav class="flex items-center text-sm font-bold h-full">
+                        <a asp-controller="Home" asp-action="Index" class="main-blue-bg text-white px-4 py-2">AVALEHT</a>
+                        <a asp-controller="Events" asp-action="Create" class="text-gray-600 hover:text-blue-600 px-4 py-2">ÜRITUSE LISAMINE</a>
+                    </nav>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 border-2 border-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-blue-600 font-bold text-xl">¥</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main>
             @RenderBody()
         </main>
+
+        <footer class="footer-bg text-white p-8 md:p-12">
+            <div class="container mx-auto grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Curabitur</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:underline">Emauris</a></li>
+                        <li><a href="#" class="hover:underline">Kfringilla</a></li>
+                        <li><a href="#" class="hover:underline">Din magna sem</a></li>
+                        <li><a href="#" class="hover:underline">Kelementum</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Fusce</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:underline">Econsectetur</a></li>
+                        <li><a href="#" class="hover:underline">Ksollicitudin</a></li>
+                        <li><a href="#" class="hover:underline">Omvulputate</a></li>
+                        <li><a href="#" class="hover:underline">Nunc fringilla tellu</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Kontakt</h3>
+                    <div class="text-sm space-y-2">
+                        <p class="font-bold">Peakontor: Tallinnas</p>
+                        <p>Väike-Ameerika 1, 11415 Tallinn</p>
+                        <p>Telefon: 605 4450</p>
+                        <p>Faks: 605 3186</p>
+                    </div>
+                </div>
+                <div class="pt-0 md:pt-11">
+                    <div class="text-sm space-y-2">
+                        <p class="font-bold">Harukontor: Võrus</p>
+                        <p>Oja tn 7 (külastusaadress)</p>
+                        <p>Telefon: 605 3330</p>
+                        <p>Faks: 605 3155</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
-
-    <footer class="site-footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>Kontakt</h5>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Kontakt</h5>
-                    <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Kontakt</h5>
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                </div>
-            </div>
-            <hr style="border-top: 1px solid #4a4a4a;">
-            <div class="text-center py-2" style="font-size: 0.9rem;">
-                &copy; @DateTime.Now.Year - Ürituste Korraldamine
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

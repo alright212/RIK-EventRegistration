@@ -193,3 +193,86 @@ img {
 .container {
   max-width: 1140px; /* Or your preferred max width */
 }
+
+/* Stiilid "Ürituse lisamine" lehe jaoks */
+
+/* Bänneri konteiner */
+.event-creation-banner {
+    position: relative;
+    margin-bottom: 2rem;
+    color: white;
+}
+
+.banner-image-container {
+    line-height: 0; /* Eemaldab pildi alt tühja ruumi */
+}
+
+.banner-image {
+    width: 100%;
+    height: auto;
+    max-height: 150px; /* Bänneri kõrgus, saab vastavalt vajadusele muuta */
+    object-fit: cover; /* Tagab, et pilt katab kogu ala, isegi kui proportsioonid ei klapi */
+}
+
+/* Pealkirja riba bänneri peal */
+.banner-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #004a99; /* Sinine taustavärv, sarnane pildile */
+    padding: 10px 20px;
+    box-sizing: border-box;
+}
+
+.banner-title h1 {
+    font-size: 1.5rem; /* Pealkirja suurus */
+    margin: 0;
+    color: white;
+    font-weight: bold;
+}
+
+/* Vormi konteiner valge taustaga */
+.form-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Vormi ridade paigutus */
+.event-form .form-group.row {
+    margin-bottom: 1.5rem; /* Suurendab vahet ridade vahel */
+}
+
+.event-form .col-form-label {
+    font-weight: 500;
+    text-align: right;
+}
+
+/* Nuppude paremale joondamine */
+.form-actions {
+    display: flex;
+    justify-content: flex-start; /* Nupud algavad vasakult */
+    gap: 10px; /* Vahe nuppude vahel */
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* Eemaldame vaikimisi breadcrumb, kuna pealkiri on bänneris */
+.breadcrumb {
+    display: none;
+}
+
+/* Kohandame Bootstrap'i nuppe, kui vaja */
+.form-actions .btn-primary {
+    background-color: #004a99; /* Sama sinine kui bänneri tiitel */
+    border-color: #004a99;
+}
+
+.form-actions .btn-secondary {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+    color: #333;
+}
