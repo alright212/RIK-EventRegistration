@@ -135,4 +135,50 @@ namespace EventRegistration.Infrastructure.Repositories
             }
         }
     }
+
+    public class EventParticipantRepository : IEventParticipantRepository
+    {
+        private readonly EventRegistrationDbContext _context;
+
+        public EventParticipantRepository(EventRegistrationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<EventParticipant?> GetByIdAsync(Guid id)
+        {
+            return await _context.EventParticipants.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<EventParticipant>> GetByEventIdAsync(Guid eventId)
+        {
+            return await _context.EventParticipants
+                .Where(ep => ep.EventId == eventId)
+                .Include(ep => ep.Participant) // Include related Participant
+                .Include(ep => ep.PaymentMethod) // Include related PaymentMethod
+                .ToListAsync();
+        }
+
+        public async Task AddAsync(EventParticipant entity)
+        {
+            await _context.EventParticipants.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(EventParticipant entity)
+        {
+            _context.EventParticipants.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                _context.EventParticipants.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
 }

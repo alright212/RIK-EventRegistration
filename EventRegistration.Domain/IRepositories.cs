@@ -29,4 +29,13 @@ namespace EventRegistration.Domain
         Task UpdateAsync(PaymentMethod entity);
         Task DeleteAsync(Guid id);
     }
+
+    public interface IEventParticipantRepository
+    {
+        Task<EventParticipant?> GetByIdAsync(Guid id);
+        Task<IEnumerable<EventParticipant>> GetByEventIdAsync(Guid eventId);
+        Task AddAsync(EventParticipant entity);
+        Task UpdateAsync(EventParticipant entity);
+        Task DeleteAsync(Guid id);
+    }
 }
