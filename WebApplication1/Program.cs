@@ -10,17 +10,58 @@ builder.Services.AddControllersWithViews();
 
 // Configure DbContext - Auto-detect database provider
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (connectionString?.StartsWith("postgresql://") == true || connectionString?.Contains("postgres") == true)
+
+// Railway might also provide DATABASE_URL environment variable
+if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = builder.Configuration["DATABASE_URL"];
+}
+
+// Debug logging for connection string
+Console.WriteLine($"Connection string: {connectionString ?? "NULL"}");
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+
+// Check all environment variables that start with CONNECTION or DATABASE
+Console.WriteLine("All connection-related environment variables:");
+foreach (
+    var envVar in Environment.GetEnvironmentVariables().Cast<System.Collections.DictionaryEntry>()
+)
+{
+    var key = envVar.Key?.ToString() ?? "";
+    if (key.ToUpper().Contains("CONNECTION") || key.ToUpper().Contains("DATABASE"))
+    {
+        Console.WriteLine($"  {key}: {envVar.Value}");
+    }
+}
+
+// Ensure we have a valid connection string
+if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = "DataSource=eventregistration.db"; // Fallback to SQLite
+    Console.WriteLine("Using fallback SQLite connection string");
+}
+
+if (
+    !string.IsNullOrEmpty(connectionString)
+    && (
+        connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase)
+        || connectionString.Contains("postgres", StringComparison.OrdinalIgnoreCase)
+    )
+)
 {
     // Use PostgreSQL for production (Railway, etc.)
+    Console.WriteLine("Using PostgreSQL provider");
     builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
-        options.UseNpgsql(connectionString));
+        options.UseNpgsql(connectionString)
+    );
 }
 else
 {
     // Use SQLite for development
+    Console.WriteLine("Using SQLite provider");
     builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
-        options.UseSqlite(connectionString));
+        options.UseSqlite(connectionString)
+    );
 }
 
 // Register your repositories and services

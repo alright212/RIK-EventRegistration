@@ -120,10 +120,7 @@ namespace EventRegistration.Application
             );
             if (participant == null)
             {
-                participant = new CompanyParticipant(
-                    dto.LegalName,
-                    dto.RegistryCode
-                );
+                participant = new CompanyParticipant(dto.LegalName, dto.RegistryCode);
                 await _participantRepository.AddAsync(participant);
             }
             else
@@ -155,7 +152,7 @@ namespace EventRegistration.Application
                 ParticipantId = participant.Id,
                 PaymentMethodId = dto.PaymentMethodId,
                 AdditionalInfo = dto.AdditionalInfo,
-                NumberOfParticipants = dto.NumberOfParticipants
+                NumberOfParticipants = dto.NumberOfParticipants,
             };
             await _eventParticipantRepository.AddAsync(eventParticipant);
         }

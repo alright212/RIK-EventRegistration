@@ -120,10 +120,12 @@ For the easiest deployment, I recommend Railway:
 Your SQLite database resets because Railway containers are ephemeral. Solutions:
 
 ### Option 1: PostgreSQL (Recommended)
+
 1. Add PostgreSQL service in Railway dashboard
 2. Set environment variable: `ConnectionStrings__DefaultConnection` = your PostgreSQL URL
 3. Redeploy - data will persist!
 
 ### Option 2: Volume Mount for SQLite
+
 1. In Railway → Settings → Volumes → Add `/app/data`
 2. Redeploy - SQLite database will persist!

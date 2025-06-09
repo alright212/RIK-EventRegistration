@@ -16,8 +16,12 @@ It will look like: `postgresql://username:password@host:port/database`
 In your Railway app service:
 1. Go to "Variables" tab
 2. Add new variable:
-   - Name: `ConnectionStrings__DefaultConnection`
-   - Value: `Your PostgreSQL connection string from Step 2`
+   - **Name:** `ConnectionStrings__DefaultConnection`
+   - **Value:** `Your PostgreSQL connection string from Step 2`
+
+**Important:** Use double underscores (`__`) in the variable name, not single underscores or colons.
+
+Railway might also automatically set `DATABASE_URL` - the app will check both variables.
 
 ## Step 4: Update your app to use PostgreSQL
 

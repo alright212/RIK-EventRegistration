@@ -10,29 +10,27 @@ namespace EventRegistration.Infrastructure.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "NumberOfParticipants",
-                table: "Participants");
+            migrationBuilder.DropColumn(name: "NumberOfParticipants", table: "Participants");
 
             migrationBuilder.AddColumn<int>(
                 name: "NumberOfParticipants",
                 table: "EventParticipants",
                 type: "INTEGER",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "NumberOfParticipants",
-                table: "EventParticipants");
+            migrationBuilder.DropColumn(name: "NumberOfParticipants", table: "EventParticipants");
 
             migrationBuilder.AddColumn<int>(
                 name: "NumberOfParticipants",
                 table: "Participants",
                 type: "INTEGER",
-                nullable: true);
+                nullable: true
+            );
         }
     }
 }

@@ -287,10 +287,7 @@ namespace EventRegistration.Tests
                 "Test Location",
                 ""
             );
-            var existingParticipant = new CompanyParticipant(
-                dto.LegalName,
-                dto.RegistryCode
-            );
+            var existingParticipant = new CompanyParticipant(dto.LegalName, dto.RegistryCode);
 
             typeof(Participant)
                 .GetProperty(nameof(Participant.Id))
