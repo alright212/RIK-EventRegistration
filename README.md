@@ -2,7 +2,7 @@
 
 A comprehensive event management system built with ASP.NET Core that allows users to create events and manage participant registrations for both individual and company participants.
 
-🚀 **Live Demo**: Deployed on [Railway](https://railway.app) - [View Application](https://web-production-490ea.up.railway.app)
+🚀 **Live Demo**: [View Application](https://web-production-490ea.up.railway.app)
 
 ## Features
 
