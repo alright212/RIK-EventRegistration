@@ -385,7 +385,6 @@ dotnet csharpier check .
    - Verify the repository is connected to Railway
    - Check build logs in Railway dashboard for errors
    - Ensure environment variables are properly configured
-   - Review [Railway Setup Guide](railway-setup.md) for troubleshooting steps
 
 3. **Test Failures**
 
@@ -414,22 +413,6 @@ dotnet csharpier check .
 5. Follow the existing code style
 6. Submit a pull request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Deployment
-
-🚀 **Live Demo**: This application is deployed on [Railway](https://railway.app), a modern application deployment platform that provides:
-
-- **Automatic deployments** from GitHub
-- **PostgreSQL database** with automatic backups
-- **Zero-configuration** deployment for .NET applications
-- **Environment variable** management
-- **Custom domains** and SSL certificates
-- **Monitoring and logs** dashboard
-
-For deployment instructions, see the [Railway Setup Guide](railway-setup.md) or [DEPLOYMENT.md](DEPLOYMENT.md) for other hosting options.
 
 ---
 

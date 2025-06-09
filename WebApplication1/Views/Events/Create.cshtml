@@ -3,45 +3,47 @@
     ViewData["Title"] = "Ürituse lisamine";
 }
 
-<div class="flex mb-8 h-20">
-    <div class="flex w-full">
-        <div class="w-1/3 main-blue-bg text-white flex items-center p-3 sm:p-4">
-            <h1 class="text-xl sm:text-2xl font-bold m-0">@ViewData["Title"]</h1>
-        </div>
-        <div class="w-2/3">
-            <img src="~/images/libled.png" alt="Ürituse lisamise päis" class="w-full h-full object-cover" />
+<div class="px-2 sm:px-4">
+    <div class="flex mb-6 sm:mb-8 h-16 sm:h-20">
+        <div class="flex w-full">
+            <div class="w-2/5 sm:w-1/3 main-blue-bg text-white flex items-center p-2 sm:p-3 lg:p-4">
+                <h1 class="text-sm sm:text-lg lg:text-xl xl:text-2xl font-bold m-0 leading-tight">@ViewData["Title"]</h1>
+            </div>
+            <div class="w-3/5 sm:w-2/3">
+                <img src="~/images/libled.png" alt="Ürituse lisamise päis" class="w-full h-full object-cover" />
+            </div>
         </div>
     </div>
-</div>
 
-<div class="bg-white p-6 sm:p-8 border border-gray-300 shadow-md rounded-md">
-    <form asp-action="Create">
-        <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4"></div>
-        <div class="mb-6">
-            <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-2">Ürituse nimi:</label>
-            <input asp-for="Name" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-            <span asp-validation-for="Name" class="text-red-600 text-sm mt-1 block"></span>
-        </div>
-        <div class="mb-6">
-            <label asp-for="EventTime" class="block text-sm font-medium text-gray-700 mb-2">Toimumisaeg:</label>
-            <input asp-for="EventTime" type="datetime-local" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-            <span asp-validation-for="EventTime" class="text-red-600 text-sm mt-1 block"></span>
-        </div>
-        <div class="mb-6">
-            <label asp-for="Location" class="block text-sm font-medium text-gray-700 mb-2">Koht:</label>
-            <input asp-for="Location" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-            <span asp-validation-for="Location" class="text-red-600 text-sm mt-1 block"></span>
-        </div>
-        <div class="mb-6">
-            <label asp-for="AdditionalInfo" class="block text-sm font-medium text-gray-700 mb-2">Lisainfo:</label>
-            <textarea asp-for="AdditionalInfo" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" rows="4"></textarea>
-            <span asp-validation-for="AdditionalInfo" class="text-red-600 text-sm mt-1 block"></span>
-        </div>
-        <div class="flex flex-col sm:flex-row sm:justify-start gap-3 mt-8 pt-6 border-t border-gray-300">
-            <a asp-controller="Home" asp-action="Index" class="w-full sm:w-auto px-4 py-2 text-center border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Tagasi</a>
-            <button type="submit" class="w-full sm:w-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white main-blue-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Lisa</button>
-        </div>
-    </form>
+    <div class="bg-white p-4 sm:p-6 lg:p-8 border border-gray-300 shadow-md rounded-md">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4"></div>
+            <div class="mb-4 sm:mb-6">
+                <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-2">Ürituse nimi:</label>
+                <input asp-for="Name" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
+                <span asp-validation-for="Name" class="text-red-600 text-xs sm:text-sm mt-1 block"></span>
+            </div>
+            <div class="mb-4 sm:mb-6">
+                <label asp-for="EventTime" class="block text-sm font-medium text-gray-700 mb-2">Toimumisaeg:</label>
+                <input asp-for="EventTime" type="datetime-local" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
+                <span asp-validation-for="EventTime" class="text-red-600 text-xs sm:text-sm mt-1 block"></span>
+            </div>
+            <div class="mb-4 sm:mb-6">
+                <label asp-for="Location" class="block text-sm font-medium text-gray-700 mb-2">Koht:</label>
+                <input asp-for="Location" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
+                <span asp-validation-for="Location" class="text-red-600 text-xs sm:text-sm mt-1 block"></span>
+            </div>
+            <div class="mb-4 sm:mb-6">
+                <label asp-for="AdditionalInfo" class="block text-sm font-medium text-gray-700 mb-2">Lisainfo:</label>
+                <textarea asp-for="AdditionalInfo" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" rows="4"></textarea>
+                <span asp-validation-for="AdditionalInfo" class="text-red-600 text-xs sm:text-sm mt-1 block"></span>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:justify-start gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-300">
+                <a asp-controller="Home" asp-action="Index" class="w-full sm:w-auto px-4 py-2 text-center border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-manipulation">Tagasi</a>
+                <button type="submit" class="w-full sm:w-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white main-blue-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-manipulation">Lisa</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 @section Scripts {

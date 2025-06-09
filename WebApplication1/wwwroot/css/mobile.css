@@ -1,0 +1,281 @@
+/* Mobile-specific improvements for Event Registration System */
+
+/* Touch-friendly interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced mobile button styles */
+@media (max-width: 768px) {
+  /* Larger tap targets for mobile */
+  button,
+  a,
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 44px; /* iOS recommended minimum */
+    touch-action: manipulation;
+  }
+
+  /* Better form input styling on mobile */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="datetime-local"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    -webkit-appearance: none;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  /* Improved spacing for mobile cards */
+  .event-card {
+    margin-bottom: 1rem;
+  }
+
+  /* Mobile-specific text sizes */
+  .mobile-text-xs {
+    font-size: 0.75rem;
+  }
+  .mobile-text-sm {
+    font-size: 0.875rem;
+  }
+  .mobile-text-base {
+    font-size: 1rem;
+  }
+  .mobile-text-lg {
+    font-size: 1.125rem;
+  }
+
+  /* Scrollable tables on mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile-specific padding */
+  .mobile-p-2 {
+    padding: 0.5rem;
+  }
+  .mobile-p-3 {
+    padding: 0.75rem;
+  }
+  .mobile-p-4 {
+    padding: 1rem;
+  }
+
+  /* Better mobile navigation */
+  .mobile-nav-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .mobile-nav-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Improved mobile form layout */
+  .mobile-form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .mobile-form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  /* Better mobile button groups */
+  .mobile-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mobile-button-group button,
+  .mobile-button-group a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Mobile-specific participant list improvements */
+  .mobile-participant-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mobile-participant-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .mobile-participant-actions a,
+  .mobile-participant-actions button {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+  }
+
+  /* Mobile-specific event item improvements */
+  .mobile-event-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-event-meta {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  .mobile-event-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .mobile-event-actions a {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .tablet-grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Adjust form layouts for tablets */
+  .tablet-form-horizontal {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+  }
+
+  .tablet-form-horizontal label {
+    width: 30%;
+    text-align: right;
+    padding-right: 1rem;
+    margin-bottom: 0;
+  }
+
+  .tablet-form-horizontal .form-input-wrapper {
+    width: 70%;
+  }
+}
+
+/* Accessibility improvements for mobile */
+@media (max-width: 768px) {
+  /* Larger focus indicators */
+  button:focus,
+  a:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Better contrast for small text */
+  .text-gray-500 {
+    color: #6b7280;
+  }
+
+  .text-gray-600 {
+    color: #4b5563;
+  }
+
+  /* Improved mobile typography */
+  h1 {
+    line-height: 1.2;
+  }
+  h2 {
+    line-height: 1.3;
+  }
+  h3 {
+    line-height: 1.4;
+  }
+
+  /* Better mobile spacing */
+  .space-y-mobile > * + * {
+    margin-top: 1rem;
+  }
+
+  /* Mobile-specific utility classes */
+  .mobile-hidden {
+    display: none;
+  }
+  .mobile-block {
+    display: block;
+  }
+  .mobile-flex {
+    display: flex;
+  }
+  .mobile-full-width {
+    width: 100%;
+  }
+  .mobile-text-center {
+    text-align: center;
+  }
+}
+
+/* Dark mode support for mobile (if needed later) */
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+  .mobile-participant-card {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
+
+  .mobile-event-item {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
+}
+
+/* Performance optimizations for mobile */
+@media (max-width: 768px) {
+  /* Reduce animations on mobile for better performance */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Optimize images for mobile */
+  img {
+    max-width: 100%;
+    height: auto;
+    image-rendering: -webkit-optimize-contrast;
+  }
+}

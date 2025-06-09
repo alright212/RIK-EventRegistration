@@ -5,41 +5,45 @@
     var pastEvents = ViewBag.PastEvents as IEnumerable<EventViewModel> ?? new List<EventViewModel>();
 }
 
-<section class="grid md:grid-cols-2">
-    <div class="main-blue-bg text-white p-8 md:p-12 flex flex-col justify-center">
-        <h1 class="text-3xl font-bold mb-4">Tere tulemast ürituste lehele!</h1>
-        <p class="text-lg leading-relaxed">
+<section class="grid grid-cols-1 lg:grid-cols-2">
+    <div class="main-blue-bg text-white p-6 sm:p-8 lg:p-12 flex flex-col justify-center order-2 lg:order-1">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-4">Tere tulemast ürituste lehele!</h1>
+        <p class="text-base sm:text-lg leading-relaxed">
              Avasta põnevaid sündmusi ja halda oma osavõtte lihtsalt ja mugavalt.
         </p>
-        <p class="mt-4 text-base leading-relaxed">
-            Siit leiad nii tulevasi kui ka juba toimunud üritusi. Loo uusi sündmusi, kutsu osalejaid ja pea järge kõige olulisema üle.
+        <p class="mt-4 text-sm sm:text-base leading-relaxed">
+            Siit leiad nii tulevasi kui ka juba toimunud üritusi. Loo uusi sündmusi, kutsu osalejaid ja pea järge kõige olulisem üle.
         </p>
     </div>
-    <div>
-        <img src="@Url.Content("~/images/pilt.png")" alt="Ürituse illustratsioon" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/a0aec0/ffffff?text=Image';">
+    <div class="order-1 lg:order-2">
+        <img src="@Url.Content("~/images/pilt.png")" alt="Ürituse illustratsioon" class="w-full h-48 sm:h-64 lg:h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/a0aec0/ffffff?text=Image';">
     </div>
 </section>
 
-<section class="bg-gray-100 p-8 md:p-12">
-    <div class="grid md:grid-cols-2 gap-12">
+<section class="bg-gray-100 p-4 sm:p-6 lg:p-8 xl:p-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
 
         <div class="event-card shadow-md rounded-md overflow-hidden">
-            <h2 class="main-blue-bg text-white text-xl font-bold p-4">Tulevased üritused</h2>
-            <div class="p-6">
+            <h2 class="main-blue-bg text-white text-lg sm:text-xl font-bold p-3 sm:p-4">Tulevased üritused</h2>
+            <div class="p-4 sm:p-6">
                 @if (futureEvents.Any())
                 {
-                    <ul>
+                    <ul class="space-y-4">
                         @foreach (var ev in futureEvents)
                         {
-                            <li class="event-item flex justify-between items-center min-h-[3rem]">
-                                <div class="flex-1 min-w-0 pr-4">
-                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="font-bold text-gray-800 hover:text-blue-600 block truncate">@ev.Name</a>
-                                    <p class="text-sm text-gray-500 mt-1 truncate">@ev.Location</p>
-                                </div>
-                                <div class="text-right flex items-center space-x-3 flex-shrink-0">
-                                    <p class="text-sm font-semibold whitespace-nowrap">@ev.EventTime.ToString("dd.MM.yyyy")</p>
-                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="text-xs font-bold text-gray-500 hover:text-blue-600 whitespace-nowrap">OSAVÕTJAD (@ev.ParticipantCount)</a>
-                                    <a asp-controller="Events" asp-action="Edit" asp-route-id="@ev.Id" class="text-xs font-bold text-blue-600 hover:text-blue-800 whitespace-nowrap">MUUDA ÜRITUST</a>
+                            <li class="event-item border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4">
+                                    <div class="flex-1 min-w-0">
+                                        <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="font-bold text-gray-800 hover:text-blue-600 block text-sm sm:text-base">@ev.Name</a>
+                                        <p class="text-xs sm:text-sm text-gray-500 mt-1">@ev.Location</p>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-right">
+                                        <p class="text-xs sm:text-sm font-semibold whitespace-nowrap">@ev.EventTime.ToString("dd.MM.yyyy")</p>
+                                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                                            <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="text-xs font-bold text-gray-500 hover:text-blue-600 whitespace-nowrap">OSAVÕTJAD (@ev.ParticipantCount)</a>
+                                            <a asp-controller="Events" asp-action="Edit" asp-route-id="@ev.Id" class="text-xs font-bold text-blue-600 hover:text-blue-800 whitespace-nowrap">MUUDA ÜRITUST</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </li>
                         }
@@ -47,30 +51,32 @@
                 }
                 else
                 {
-                    <p>Tulevasi üritusi hetkel ei ole.</p>
+                    <p class="text-sm sm:text-base">Tulevasi üritusi hetkel ei ole.</p>
                 }
-                <div class="mt-8">
-                    <a asp-controller="Events" asp-action="Create" class="font-bold text-sm text-gray-600 hover:text-blue-700 uppercase">LISA UUS ÜRITUS</a>
+                <div class="mt-6 sm:mt-8">
+                    <a asp-controller="Events" asp-action="Create" class="font-bold text-xs sm:text-sm text-gray-600 hover:text-blue-700 uppercase">LISA UUS ÜRITUS</a>
                 </div>
             </div>
         </div>
 
         <div class="event-card shadow-md rounded-md overflow-hidden">
-            <h2 class="main-blue-bg text-white text-xl font-bold p-4">Toimunud üritused</h2>
-            <div class="p-6">
+            <h2 class="main-blue-bg text-white text-lg sm:text-xl font-bold p-3 sm:p-4">Toimunud üritused</h2>
+            <div class="p-4 sm:p-6">
                 @if (pastEvents.Any())
                 {
-                    <ul>
+                    <ul class="space-y-4">
                         @foreach (var ev in pastEvents)
                         {
-                            <li class="event-item flex justify-between items-center min-h-[3rem]">
-                                <div class="flex-1 min-w-0 pr-4">
-                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="font-bold text-gray-800 hover:text-blue-600 block truncate">@ev.Name</a>
-                                    <p class="text-sm text-gray-500 mt-1 truncate">@ev.Location</p>
-                                </div>
-                                <div class="text-right flex items-center space-x-4 flex-shrink-0">
-                                    <p class="text-sm font-semibold whitespace-nowrap">@ev.EventTime.ToString("dd.MM.yyyy")</p>
-                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="text-xs font-bold text-gray-500 hover:text-blue-600 whitespace-nowrap">OSAVÕTJAD (@ev.ParticipantCount)</a>
+                            <li class="event-item border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4">
+                                    <div class="flex-1 min-w-0">
+                                        <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="font-bold text-gray-800 hover:text-blue-600 block text-sm sm:text-base">@ev.Name</a>
+                                        <p class="text-xs sm:text-sm text-gray-500 mt-1">@ev.Location</p>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-right">
+                                        <p class="text-xs sm:text-sm font-semibold whitespace-nowrap">@ev.EventTime.ToString("dd.MM.yyyy")</p>
+                                        <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="text-xs font-bold text-gray-500 hover:text-blue-600 whitespace-nowrap">OSAVÕTJAD (@ev.ParticipantCount)</a>
+                                    </div>
                                 </div>
                             </li>
                         }
@@ -78,7 +84,7 @@
                 }
                 else
                 {
-                    <p>Toimunud üritusi hetkel ei ole.</p>
+                    <p class="text-sm sm:text-base">Toimunud üritusi hetkel ei ole.</p>
                 }
             </div>
         </div>

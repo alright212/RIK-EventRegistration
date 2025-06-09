@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - Üritused</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="~/css/mobile.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
@@ -41,43 +42,72 @@
     <div class="max-w-6xl mx-auto">
 
         <header class="header-bg shadow-lg">
-            <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-                <div class="flex items-center space-x-8">
-                    <div class="logo-box font-black text-xl">
-                        NULLAM
-                    </div>
-                    
-                    <nav class="flex items-center text-sm font-bold h-full">
-                        @{
-                            var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-                            var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
-                        }
+            <div class="container mx-auto px-4 sm:px-6 py-3">
+                <div class="flex justify-between items-center">
+                    <!-- Logo and Desktop Navigation -->
+                    <div class="flex items-center space-x-4 sm:space-x-8">
+                        <div class="logo-box font-black text-lg sm:text-xl">
+                            NULLAM
+                        </div>
                         
+                        <!-- Desktop Navigation -->
+                        <nav class="hidden lg:flex items-center text-sm font-bold h-full">
+                            @{
+                                var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                                var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                            }
+                            
+                            <a asp-controller="Home" asp-action="Index" 
+                               class="px-4 py-2 @(currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600")">
+                               AVALEHT
+                            </a>
+                            
+                            <a asp-controller="Events" asp-action="Create" 
+                               class="px-4 py-2 @(currentController.Equals("Events", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Create", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600")">
+                               ÜRITUSE LISAMINE
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- Right side - Symbol and Mobile Menu Button -->
+                    <div class="flex items-center space-x-4">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
+                            <img src="@Url.Content("~/images/symbol.png")" alt="Symbol" class="w-full h-full object-cover">
+                        </div>
+                        
+                        <!-- Mobile Menu Button -->
+                        <button class="lg:hidden p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:text-blue-600" 
+                                onclick="toggleMobileMenu()">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Menu -->
+                <nav id="mobileMenu" class="lg:hidden hidden mt-4 pb-4 border-t border-gray-200">
+                    <div class="space-y-2 pt-4">
                         <a asp-controller="Home" asp-action="Index" 
-                           class="px-4 py-2 @(currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600")">
+                           class="block px-4 py-3 text-sm font-bold @(currentController.Equals("Home", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600 hover:bg-gray-50")">
                            AVALEHT
                         </a>
                         
                         <a asp-controller="Events" asp-action="Create" 
-                           class="px-4 py-2 @(currentController.Equals("Events", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Create", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600")">
+                           class="block px-4 py-3 text-sm font-bold @(currentController.Equals("Events", StringComparison.OrdinalIgnoreCase) && currentAction.Equals("Create", StringComparison.OrdinalIgnoreCase) ? "main-blue-bg text-white" : "text-gray-600 hover:text-blue-600 hover:bg-gray-50")">
                            ÜRITUSE LISAMINE
                         </a>
-                    </nav>
                     </div>
-                <div class="flex items-center">
-                    <div class="w-10 h-10 flex items-center justify-center">
-                        <img src="@Url.Content("~/images/symbol.png")" alt="Symbol" class="w-full h-full object-cover">
-                    </div>
-                </div>
+                </nav>
             </div>
         </header>
 
-        <main class="mt-[30px] bg-white shadow-lg">
+        <main class="mt-6 sm:mt-[30px] bg-white shadow-lg">
             @RenderBody()
         </main>
 
-        <footer class="footer-bg text-white p-8 md:p-12 mt-[30px] shadow-lg">
-            <div class="container mx-auto grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <footer class="footer-bg text-white p-6 sm:p-8 md:p-12 mt-[30px] shadow-lg">
+            <div class="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                 <div>
                     <h3 class="font-bold text-lg mb-4">Curabitur</h3>
                     <ul class="space-y-2 text-sm">
@@ -105,7 +135,7 @@
                         <p>Faks: 605 3186</p>
                     </div>
                 </div>
-                <div class="pt-0 md:pt-11">
+                <div class="pt-0 lg:pt-11">
                     <div class="text-sm space-y-2">
                         <p class="font-bold">Harukontor: Võrus</p>
                         <p>Oja tn 7 (külastusaadress)</p>
@@ -116,6 +146,30 @@
             </div>
         </footer>
     </div>
+    
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileButton = event.target.closest('[onclick="toggleMobileMenu()"]');
+            
+            if (!mobileButton && !mobileMenu.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+        
+        // Close mobile menu when window is resized to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) {
+                document.getElementById('mobileMenu').classList.add('hidden');
+            }
+        });
+    </script>
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>
