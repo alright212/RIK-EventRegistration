@@ -346,6 +346,12 @@ dotnet csharpier check .
 - Events ↔ Participants (Many-to-Many through EventParticipants)
 - EventParticipants → PaymentMethods (Many-to-One)
 
+### Entity Relationship Diagram
+
+![Database ERD](WebApplication1/wwwroot/images/erd.png)
+
+*The ERD shows the complete database schema with all entities, relationships, and key constraints used in the Event Registration System.*
+
 ## Development Guidelines
 
 ### Adding New Features
