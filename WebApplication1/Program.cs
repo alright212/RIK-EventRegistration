@@ -1,6 +1,6 @@
-using EventRegistration.Infrastructure;
-using EventRegistration.Domain;
 using EventRegistration.Application;
+using EventRegistration.Domain;
+using EventRegistration.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +10,8 @@ builder.Services.AddControllersWithViews();
 
 // Configure DbContext with SQLite
 builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 // Register your repositories and services
 // The framework will now 'inject' these wherever they are requested
@@ -39,8 +40,6 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

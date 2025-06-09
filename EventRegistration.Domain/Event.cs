@@ -6,8 +6,9 @@ namespace EventRegistration.Domain
 {
     public class Event
     {
-        // Add a public constructor to allow instantiation.
-        public Event() 
+        public Event pastEvent;
+
+        public Event()
         {
             Name = string.Empty;
             Location = string.Empty;
@@ -16,13 +17,13 @@ namespace EventRegistration.Domain
         }
 
         [Key]
-        public Guid Id { get; set; } // Make the setter public
+        public Guid Id { get; set; }
 
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
 
-        public DateTime Time { get; set; } // Renamed from EventTime
+        public DateTime Time { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -30,8 +31,9 @@ namespace EventRegistration.Domain
 
         [StringLength(1000)]
         public string AdditionalInfo { get; set; }
-        
-        public ICollection<EventParticipant> Participants { get; set; } = new List<EventParticipant>(); // Renamed from EventParticipants and initialized
+
+        public ICollection<EventParticipant> Participants { get; set; } =
+            new List<EventParticipant>();
 
         public Event(string name, DateTime eventTime, string location, string additionalInfo)
         {
@@ -42,20 +44,25 @@ namespace EventRegistration.Domain
 
             Id = Guid.NewGuid();
             Name = name;
-            Time = eventTime; // Adjusted to new property name
+            Time = eventTime;
             Location = location;
             AdditionalInfo = additionalInfo;
-            Participants = new HashSet<EventParticipant>(); // Adjusted to new property name
+            Participants = new HashSet<EventParticipant>();
         }
 
-        public void UpdateDetails(string name, DateTime eventTime, string location, string? additionalInfo)
+        public void UpdateDetails(
+            string name,
+            DateTime eventTime,
+            string location,
+            string? additionalInfo
+        )
         {
             if (eventTime <= DateTime.UtcNow)
             {
                 throw new ArgumentException("Event time must be in the future.", nameof(eventTime));
             }
             Name = name;
-            Time = eventTime; // Adjusted to new property name
+            Time = eventTime;
             Location = location;
             AdditionalInfo = additionalInfo ?? string.Empty;
         }

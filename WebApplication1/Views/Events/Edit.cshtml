@@ -1,6 +1,6 @@
-@model EventRegistration.Application.CreateEventDto
+@model EventRegistration.Application.UpdateEventDto
 @{
-    ViewData["Title"] = "Ürituse lisamine";
+    ViewData["Title"] = "Ürituse muutmine";
 }
 
 <div class="flex mb-8 h-20">
@@ -9,13 +9,13 @@
             <h1 class="text-xl sm:text-2xl font-bold m-0">@ViewData["Title"]</h1>
         </div>
         <div class="w-2/3">
-            <img src="~/images/libled.png" alt="Ürituse lisamise päis" class="w-full h-full object-cover" />
+            <img src="~/images/libled.png" alt="Ürituse muutmise päis" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x300/a0aec0/ffffff?text=Image';" />
         </div>
     </div>
 </div>
 
 <div class="bg-white p-6 sm:p-8 border border-gray-300 shadow-md rounded-md">
-    <form asp-action="Create">
+    <form asp-action="Edit">
         <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4"></div>
         <div class="sm:flex sm:items-baseline mb-6">
             <label asp-for="Name" class="block text-sm font-medium text-gray-700 sm:w-1/4 sm:text-right sm:pr-4">Ürituse nimi:</label>
@@ -41,13 +41,13 @@
         <div class="sm:flex sm:items-baseline mb-6">
             <label asp-for="AdditionalInfo" class="block text-sm font-medium text-gray-700 sm:w-1/4 sm:text-right sm:pr-4">Lisainfo:</label>
             <div class="mt-1 sm:mt-0 sm:w-3/4">
-                <textarea asp-for="AdditionalInfo" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" rows="4"></textarea>
+                <textarea asp-for="AdditionalInfo" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" rows="4" placeholder="Ürituse kirjeldus, erinõuded või muud olulised märkused..."></textarea>
                 <span asp-validation-for="AdditionalInfo" class="text-red-600 text-sm mt-1 block"></span>
             </div>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-start gap-3 mt-8 pt-6 border-t border-gray-300">
-            <a asp-controller="Home" asp-action="Index" class="w-full sm:w-auto px-4 py-2 text-center border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Tagasi</a>
-            <button type="submit" class="w-full sm:w-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white main-blue-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Lisa</button>
+            <a href="javascript:history.back()" class="w-full sm:w-auto px-4 py-2 text-center border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Tühista</a>
+            <button type="submit" class="w-full sm:w-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white main-blue-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Salvesta muudatused</button>
         </div>
     </form>
 </div>

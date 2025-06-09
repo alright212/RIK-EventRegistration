@@ -21,7 +21,6 @@ namespace EventRegistration.Application
         public int NumberOfParticipants { get; set; }
 
         [Required]
-        // FIX: Changed PaymentMethodId from Guid to int
         public int PaymentMethodId { get; set; }
 
         [StringLength(5000)]

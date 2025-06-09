@@ -5,14 +5,11 @@ namespace EventRegistration.Domain
 {
     public abstract class Participant
     {
-        // Changed Id from Guid to int.
-        // The database will be responsible for generating this value.
         public int Id { get; private set; }
         public ICollection<EventParticipant> EventParticipants { get; set; }
 
         protected Participant()
         {
-            // Removed Id initialization.
             EventParticipants = new HashSet<EventParticipant>();
         }
     }
@@ -23,7 +20,8 @@ namespace EventRegistration.Domain
         public string LastName { get; set; }
         public string PersonalIdCode { get; set; }
 
-        public IndividualParticipant(string firstName, string lastName, string personalIdCode) : base()
+        public IndividualParticipant(string firstName, string lastName, string personalIdCode)
+            : base()
         {
             FirstName = firstName;
             LastName = lastName;
@@ -37,7 +35,8 @@ namespace EventRegistration.Domain
         public string RegistryCode { get; set; }
         public int NumberOfParticipants { get; set; }
 
-        public CompanyParticipant(string legalName, string registryCode, int numberOfParticipants) : base()
+        public CompanyParticipant(string legalName, string registryCode, int numberOfParticipants)
+            : base()
         {
             LegalName = legalName;
             RegistryCode = registryCode;

@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using EventRegistration.Application;
 using EventRegistration.Domain;
 using EventRegistration.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace EventRegistration.Tests
@@ -22,7 +22,7 @@ namespace EventRegistration.Tests
         {
             _mockEventRepository = new Mock<IEventRepository>();
             _mockParticipantRepository = new Mock<IParticipantRepository>();
-            
+
             var options = new DbContextOptionsBuilder<EventRegistrationDbContext>().Options;
             _mockDbContext = new Mock<EventRegistrationDbContext>(options);
 
@@ -36,19 +36,18 @@ namespace EventRegistration.Tests
         [Fact]
         public async Task GetUpcomingEvents_ShouldReturnOrderedUpcomingEvents()
         {
-            // Arrange
             var events = new List<Event>
             {
                 new Event("Future Event 2", DateTime.UtcNow.AddDays(2), "Location", ""),
-                new Event("Future Event 1", DateTime.UtcNow.AddDays(1), "Location", "")
+                new Event("Future Event 1", DateTime.UtcNow.AddDays(1), "Location", ""),
             };
-            _mockEventRepository.Setup(repo => repo.GetUpcomingEvents()).ReturnsAsync(events.OrderBy(e => e.Time));
+            _mockEventRepository
+                .Setup(repo => repo.GetUpcomingEvents())
+                .ReturnsAsync(events.OrderBy(e => e.Time));
 
-            // Act
             var result = await _eventService.GetUpcomingEvents();
             var resultList = result.ToList();
 
-            // Assert
             Assert.Equal(2, resultList.Count);
             Assert.Equal("Future Event 1", resultList[0].Name);
             Assert.Equal("Future Event 2", resultList[1].Name);
@@ -57,22 +56,17 @@ namespace EventRegistration.Tests
         [Fact]
         public async Task GetPastEvents_ShouldReturnOrderedPastEvents()
         {
-            // Arrange
-            // FIX: Use the parameterless constructor and set properties manually
-            // to bypass the constructor's validation for test setup.
             var events = new List<Event>
             {
                 new Event { Name = "Future Event", Time = DateTime.UtcNow.AddDays(1) },
                 new Event { Name = "Past Event 1", Time = DateTime.UtcNow.AddDays(-2) },
-                new Event { Name = "Past Event 2", Time = DateTime.UtcNow.AddDays(-1) }
+                new Event { Name = "Past Event 2", Time = DateTime.UtcNow.AddDays(-1) },
             };
             _mockEventRepository.Setup(repo => repo.GetAllAsync()).ReturnsAsync(events);
-        
-            // Act
+
             var result = await _eventService.GetPastEvents();
             var resultList = result.ToList();
 
-            // Assert
             Assert.Equal(2, resultList.Count);
             Assert.Equal("Past Event 2", resultList[0].Name);
             Assert.Equal("Past Event 1", resultList[1].Name);
@@ -81,52 +75,58 @@ namespace EventRegistration.Tests
         [Fact]
         public async Task DeleteEvent_ShouldThrowException_WhenDeletingPastEvent()
         {
-            // Arrange
-            // FIX: Use the parameterless constructor for test setup.
-            var pastEvent = new Event { Id = Guid.NewGuid(), Name = "Past Event", Time = DateTime.UtcNow.AddDays(-1) };
-            _mockEventRepository.Setup(repo => repo.GetByIdAsync(pastEvent.Id)).ReturnsAsync(pastEvent);
+            var pastEvent = new Event
+            {
+                Id = Guid.NewGuid(),
+                Name = "Past Event",
+                Time = DateTime.UtcNow.AddDays(-1),
+            };
+            _mockEventRepository
+                .Setup(repo => repo.GetByIdAsync(pastEvent.Id))
+                .ReturnsAsync(pastEvent);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _eventService.DeleteEvent(pastEvent.Id));
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _eventService.DeleteEvent(pastEvent.Id)
+            );
         }
 
         [Fact]
         public async Task DeleteEvent_ShouldRemoveEvent_WhenEventIsInFuture()
         {
-            // Arrange
             var futureEvent = new Event("Future Event", DateTime.UtcNow.AddDays(1), "Location", "");
-            _mockEventRepository.Setup(repo => repo.GetByIdAsync(futureEvent.Id)).ReturnsAsync(futureEvent);
+            _mockEventRepository
+                .Setup(repo => repo.GetByIdAsync(futureEvent.Id))
+                .ReturnsAsync(futureEvent);
 
-            // Act
             await _eventService.DeleteEvent(futureEvent.Id);
 
-            // Assert
             _mockEventRepository.Verify(repo => repo.RemoveAsync(futureEvent), Times.Once);
         }
-        
+
         [Fact]
         public async Task UpdateEvent_ShouldThrowException_WhenEventNotFound()
         {
-            // Arrange
             var nonExistentEventId = Guid.NewGuid();
             var updateDto = new UpdateEventDto();
-            _mockEventRepository.Setup(repo => repo.GetByIdAsync(nonExistentEventId)).ReturnsAsync((Event)null);
+            _mockEventRepository
+                .Setup(repo => repo.GetByIdAsync(nonExistentEventId))
+                .ReturnsAsync((Event?)null);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(() => _eventService.UpdateEvent(nonExistentEventId, updateDto));
+            await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+                _eventService.UpdateEvent(nonExistentEventId, updateDto)
+            );
         }
-        
+
         [Fact]
         public async Task GetEventDetail_ShouldReturnNull_WhenEventDoesNotExist()
         {
-            // Arrange
             var eventId = Guid.NewGuid();
-            _mockEventRepository.Setup(repo => repo.GetEventWithParticipantsAsync(eventId)).ReturnsAsync((Event)null);
+            _mockEventRepository
+                .Setup(repo => repo.GetEventWithParticipantsAsync(eventId))
+                .ReturnsAsync((Event?)null);
 
-            // Act
             var result = await _eventService.GetEventDetail(eventId);
 
-            // Assert
             Assert.Null(result);
         }
     }

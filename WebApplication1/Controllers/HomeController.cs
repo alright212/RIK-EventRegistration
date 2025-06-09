@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
+using EventRegistration.Application;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
-using EventRegistration.Application;
-using System.Threading.Tasks;
 
 namespace WebApplication1.Controllers
 {
@@ -37,7 +37,12 @@ namespace WebApplication1.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(
+                new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                }
+            );
         }
     }
 }

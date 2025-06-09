@@ -1,8 +1,8 @@
-using EventRegistration.Domain;
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using EventRegistration.Domain;
 using EventRegistration.Infrastructure;
 
 namespace EventRegistration.Application
@@ -13,7 +13,11 @@ namespace EventRegistration.Application
         private readonly IParticipantRepository _participantRepository;
         private readonly EventRegistrationDbContext _dbContext;
 
-        public EventService(IEventRepository eventRepository, IParticipantRepository participantRepository, EventRegistrationDbContext dbContext)
+        public EventService(
+            IEventRepository eventRepository,
+            IParticipantRepository participantRepository,
+            EventRegistrationDbContext dbContext
+        )
         {
             _eventRepository = eventRepository;
             _participantRepository = participantRepository;
@@ -24,7 +28,10 @@ namespace EventRegistration.Application
         {
             if (createEventDto.AdditionalInfo?.Length > 1000)
             {
-                throw new ArgumentException("Additional info cannot exceed 1000 characters.", nameof(createEventDto.AdditionalInfo));
+                throw new ArgumentException(
+                    "Additional info cannot exceed 1000 characters.",
+                    nameof(createEventDto.AdditionalInfo)
+                );
             }
 
             var newEvent = new Event(
@@ -48,7 +55,7 @@ namespace EventRegistration.Application
                     EventTime = e.Time,
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
-                    ParticipantCount = e.Participants?.Count ?? 0
+                    ParticipantCount = e.Participants?.Count ?? 0,
                 })
                 .OrderBy(e => e.EventTime);
         }
@@ -65,7 +72,7 @@ namespace EventRegistration.Application
                     EventTime = e.Time,
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
-                    ParticipantCount = e.Participants?.Count ?? 0
+                    ParticipantCount = e.Participants?.Count ?? 0,
                 })
                 .OrderByDescending(e => e.EventTime);
         }
@@ -78,7 +85,9 @@ namespace EventRegistration.Application
                 return null;
             }
 
-            var participants = eventEntity.Participants?.Select(ep => MapToParticipantViewModel(ep)).ToList() ?? new List<ParticipantViewModel>();
+            var participants =
+                eventEntity.Participants?.Select(ep => MapToParticipantViewModel(ep)).ToList()
+                ?? new List<ParticipantViewModel>();
 
             return new EventDetailViewModel
             {
@@ -89,12 +98,12 @@ namespace EventRegistration.Application
                     EventTime = eventEntity.Time,
                     Location = eventEntity.Location,
                     AdditionalInfo = eventEntity.AdditionalInfo,
-                    ParticipantCount = participants.Count
+                    ParticipantCount = participants.Count,
                 },
-                Participants = participants
+                Participants = participants,
             };
         }
-        
+
         public async Task<UpdateEventDto?> GetEventForEdit(Guid id)
         {
             var eventEntity = await _eventRepository.GetByIdAsync(id);
@@ -107,42 +116,41 @@ namespace EventRegistration.Application
                 Name = eventEntity.Name,
                 EventTime = eventEntity.Time,
                 Location = eventEntity.Location,
-                AdditionalInfo = eventEntity.AdditionalInfo
+                AdditionalInfo = eventEntity.AdditionalInfo,
             };
         }
 
-        public async Task UpdateEvent(Guid eventId, UpdateEventDto updateEventDto) // Changed signature
+        public async Task UpdateEvent(Guid eventId, UpdateEventDto updateEventDto)
         {
-            var eventToUpdate = await _eventRepository.GetByIdAsync(eventId); // Use eventId parameter
+            var eventToUpdate = await _eventRepository.GetByIdAsync(eventId);
             if (eventToUpdate == null)
             {
                 throw new KeyNotFoundException("Event not found.");
             }
-            
+
             eventToUpdate.UpdateDetails(
                 updateEventDto.Name,
                 updateEventDto.EventTime,
                 updateEventDto.Location,
                 updateEventDto.AdditionalInfo
             );
-            
+
             await _eventRepository.UpdateAsync(eventToUpdate);
         }
-
 
         public async Task DeleteEvent(Guid id)
         {
             var eventToDelete = await _eventRepository.GetByIdAsync(id);
             if (eventToDelete == null)
             {
-                return; 
+                return;
             }
 
             if (eventToDelete.Time <= DateTime.UtcNow)
             {
                 throw new InvalidOperationException("Cannot delete past or current events.");
             }
-            
+
             await _eventRepository.RemoveAsync(eventToDelete);
         }
 
@@ -150,16 +158,18 @@ namespace EventRegistration.Application
         {
             if (eventParticipant == null || eventParticipant.Participant == null)
             {
-                throw new InvalidOperationException("EventParticipant data is incomplete for mapping.");
+                throw new InvalidOperationException(
+                    "EventParticipant data is incomplete for mapping."
+                );
             }
-            
+
             var viewModel = new ParticipantViewModel
             {
                 EventId = eventParticipant.EventId,
                 ParticipantId = eventParticipant.Participant.Id,
                 PaymentMethodId = eventParticipant.PaymentMethodId,
                 PaymentMethodName = eventParticipant.PaymentMethod?.Name ?? "Unknown",
-                EventParticipantAdditionalInfo = eventParticipant.AdditionalInfo
+                EventParticipantAdditionalInfo = eventParticipant.AdditionalInfo,
             };
 
             if (eventParticipant.Participant is IndividualParticipant individual)

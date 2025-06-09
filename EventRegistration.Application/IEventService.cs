@@ -8,10 +8,10 @@ namespace EventRegistration.Application
     {
         Task<IEnumerable<EventViewModel>> GetUpcomingEvents();
         Task<IEnumerable<EventViewModel>> GetPastEvents();
-        Task<EventDetailViewModel?> GetEventDetail(Guid id); // Changed int to Guid, made nullable
-        Task<UpdateEventDto?> GetEventForEdit(Guid id); // Changed int to Guid, made nullable
+        Task<EventDetailViewModel?> GetEventDetail(Guid id);
+        Task<UpdateEventDto?> GetEventForEdit(Guid id);
         Task CreateEvent(CreateEventDto createEventDto);
-        Task UpdateEvent(Guid eventId, UpdateEventDto updateEventDto); // Changed signature
-        Task DeleteEvent(Guid id); // Changed int to Guid
+        Task UpdateEvent(Guid eventId, UpdateEventDto updateEventDto);
+        Task DeleteEvent(Guid id);
     }
 }

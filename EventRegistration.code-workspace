@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "csharpier.useLocalVersion": true,
+    "csharpier.enableDebugLogs": true,
+    "omnisharp.useModernNet": true,
+    "dotnet.defaultSolution": "WebApplication1/WebApplication1.sln"
+  }
+}
