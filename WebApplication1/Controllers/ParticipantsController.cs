@@ -70,13 +70,39 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(AddOrEditParticipantViewModel viewModel)
         {
+            if (await IsEventInPast(viewModel.EventId))
+            {
+                TempData["ErrorMessage"] = "Cannot add participants to past events.";
+                return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
+            }
+
+            // Clear ModelState errors for the unused participant type
+            if (viewModel.ParticipantType == "Individual")
+            {
+                // Remove all Company-related validation errors
+                var companyKeys = ModelState.Keys.Where(k => k.StartsWith("Company.")).ToList();
+                foreach (var key in companyKeys)
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            else if (viewModel.ParticipantType == "Company")
+            {
+                // Remove all Individual-related validation errors
+                var individualKeys = ModelState
+                    .Keys.Where(k => k.StartsWith("Individual."))
+                    .ToList();
+                foreach (var key in individualKeys)
+                {
+                    ModelState.Remove(key);
+                }
+            }
+
             try
             {
                 if (viewModel.ParticipantType == "Individual")
                 {
                     viewModel.Individual.EventId = viewModel.EventId;
-
-                    // Validate the individual participant
                     var validationResults = new List<ValidationResult>();
                     var validationContext = new ValidationContext(viewModel.Individual);
 
@@ -92,6 +118,7 @@ namespace WebApplication1.Controllers
                         await _participantService.AddIndividualParticipantAsync(
                             viewModel.Individual
                         );
+                        TempData["SuccessMessage"] = "Participant added successfully.";
                         return RedirectToAction(
                             "Details",
                             "Events",
@@ -100,14 +127,13 @@ namespace WebApplication1.Controllers
                     }
                     else
                     {
-                        // Add validation errors to ModelState
-                        foreach (var validationResult in validationResults)
+                        foreach (var vr in validationResults)
                         {
-                            foreach (var memberName in validationResult.MemberNames)
+                            foreach (var memberName in vr.MemberNames.DefaultIfEmpty(string.Empty))
                             {
                                 ModelState.AddModelError(
-                                    $"Individual.{memberName}",
-                                    validationResult.ErrorMessage ?? "Validation error"
+                                    $"Individual.{memberName}".TrimEnd('.'),
+                                    vr.ErrorMessage ?? "Validation error"
                                 );
                             }
                         }
@@ -116,8 +142,6 @@ namespace WebApplication1.Controllers
                 else if (viewModel.ParticipantType == "Company")
                 {
                     viewModel.Company.EventId = viewModel.EventId;
-
-                    // Validate the company participant
                     var validationResults = new List<ValidationResult>();
                     var validationContext = new ValidationContext(viewModel.Company);
 
@@ -131,6 +155,7 @@ namespace WebApplication1.Controllers
                     )
                     {
                         await _participantService.AddCompanyParticipantAsync(viewModel.Company);
+                        TempData["SuccessMessage"] = "Participant added successfully.";
                         return RedirectToAction(
                             "Details",
                             "Events",
@@ -139,14 +164,13 @@ namespace WebApplication1.Controllers
                     }
                     else
                     {
-                        // Add validation errors to ModelState
-                        foreach (var validationResult in validationResults)
+                        foreach (var vr in validationResults)
                         {
-                            foreach (var memberName in validationResult.MemberNames)
+                            foreach (var memberName in vr.MemberNames.DefaultIfEmpty(string.Empty))
                             {
                                 ModelState.AddModelError(
-                                    $"Company.{memberName}",
-                                    validationResult.ErrorMessage ?? "Validation error"
+                                    $"Company.{memberName}".TrimEnd('.'),
+                                    vr.ErrorMessage ?? "Validation error"
                                 );
                             }
                         }
@@ -167,6 +191,10 @@ namespace WebApplication1.Controllers
                     "Sama isikukoodiga osavõtja on juba sellele üritusele registreeritud. Ühe isikukoodi saab üritusele registreerida ainult ühe korra."
                 );
             }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
             catch (Exception)
             {
                 ModelState.AddModelError(
@@ -175,9 +203,22 @@ namespace WebApplication1.Controllers
                 );
             }
 
-            // If we got this far, something failed, redirect back with form data preserved
-            // Store form values to repopulate the form
-            if (viewModel.ParticipantType == "Individual")
+            // If we reach here, validation failed or an exception was caught.
+            // Store validation errors in TempData and redirect back to Events/Details page
+            var validationErrors = new List<string>();
+            foreach (var modelError in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                validationErrors.Add(modelError.ErrorMessage);
+            }
+
+            if (validationErrors.Any())
+            {
+                TempData["ValidationErrors"] = validationErrors;
+            }
+
+            // Store form data in TempData to preserve user input
+            TempData["ParticipantType"] = viewModel.ParticipantType;
+            if (viewModel.ParticipantType == "Individual" && viewModel.Individual != null)
             {
                 TempData["Individual.FirstName"] = viewModel.Individual.FirstName;
                 TempData["Individual.LastName"] = viewModel.Individual.LastName;
@@ -185,7 +226,7 @@ namespace WebApplication1.Controllers
                 TempData["Individual.PaymentMethodId"] = viewModel.Individual.PaymentMethodId;
                 TempData["Individual.AdditionalInfo"] = viewModel.Individual.AdditionalInfo;
             }
-            else if (viewModel.ParticipantType == "Company")
+            else if (viewModel.ParticipantType == "Company" && viewModel.Company != null)
             {
                 TempData["Company.LegalName"] = viewModel.Company.LegalName;
                 TempData["Company.RegistryCode"] = viewModel.Company.RegistryCode;
@@ -193,16 +234,6 @@ namespace WebApplication1.Controllers
                 TempData["Company.PaymentMethodId"] = viewModel.Company.PaymentMethodId;
                 TempData["Company.AdditionalInfo"] = viewModel.Company.AdditionalInfo;
             }
-
-            TempData["ParticipantType"] = viewModel.ParticipantType;
-
-            // Store validation errors for display
-            var validationErrors = new List<string>();
-            foreach (var modelError in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                validationErrors.Add(modelError.ErrorMessage);
-            }
-            TempData["ValidationErrors"] = validationErrors;
 
             return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
         }
@@ -344,6 +375,28 @@ namespace WebApplication1.Controllers
             if (await IsEventInPast(viewModel.EventId))
             {
                 return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
+            }
+
+            // Clear ModelState errors for the unused participant type
+            if (viewModel.ParticipantType == "Individual")
+            {
+                // Remove all Company-related validation errors
+                var companyKeys = ModelState.Keys.Where(k => k.StartsWith("Company.")).ToList();
+                foreach (var key in companyKeys)
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            else if (viewModel.ParticipantType == "Company")
+            {
+                // Remove all Individual-related validation errors
+                var individualKeys = ModelState
+                    .Keys.Where(k => k.StartsWith("Individual."))
+                    .ToList();
+                foreach (var key in individualKeys)
+                {
+                    ModelState.Remove(key);
+                }
             }
 
             try
@@ -509,6 +562,97 @@ namespace WebApplication1.Controllers
             }
 
             return Json(company);
+        }
+
+        // POST: Participants/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(AddOrEditParticipantViewModel model)
+        {
+            // Clear ModelState errors for the unused participant type
+            if (model.ParticipantType == "Individual")
+            {
+                // Remove all Company-related validation errors
+                var companyKeys = ModelState.Keys.Where(k => k.StartsWith("Company.")).ToList();
+                foreach (var key in companyKeys)
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            else if (model.ParticipantType == "Company")
+            {
+                // Remove all Individual-related validation errors
+                var individualKeys = ModelState
+                    .Keys.Where(k => k.StartsWith("Individual."))
+                    .ToList();
+                foreach (var key in individualKeys)
+                {
+                    ModelState.Remove(key);
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (model.ParticipantType == "Individual")
+                    {
+                        var dto = new AddIndividualParticipantDto
+                        {
+                            EventId = model.EventId,
+                            FirstName = model.Individual.FirstName,
+                            LastName = model.Individual.LastName,
+                            PersonalIdCode = model.Individual.PersonalIdCode,
+                            PaymentMethodId = model.Individual.PaymentMethodId,
+                            AdditionalInfo = model.Individual.AdditionalInfo,
+                        };
+                        await _participantService.AddIndividualParticipantAsync(dto);
+                    }
+                    else // It's a Company
+                    {
+                        var dto = new AddCompanyParticipantDto
+                        {
+                            EventId = model.EventId,
+                            LegalName = model.Company.LegalName,
+                            RegistryCode = model.Company.RegistryCode,
+                            NumberOfParticipants = model.Company.NumberOfParticipants,
+                            PaymentMethodId = model.Company.PaymentMethodId,
+                            AdditionalInfo = model.Company.AdditionalInfo,
+                        };
+                        await _participantService.AddCompanyParticipantAsync(dto);
+                    }
+                    return RedirectToAction("Details", "Events", new { id = model.EventId });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    if (ex.Message.Contains("Participant is already registered for this event."))
+                    {
+                        ModelState.AddModelError(
+                            string.Empty,
+                            "Sama isikukoodiga osavõtja on juba sellele üritusele registreeritud. Ühe isikukoodi saab üritusele registreerida ainult ühe korra."
+                        );
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "An unexpected error occurred.");
+                    }
+                }
+                catch (ArgumentException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+
+            var paymentMethods = await _participantService.GetPaymentMethodsAsync();
+            model.PaymentMethods = paymentMethods
+                .Select(p => new SelectListItem(p.Name, p.Id.ToString()))
+                .ToList();
+            var eventDetails = await _eventService.GetEventDetail(model.EventId);
+            if (eventDetails != null)
+            {
+                model.EventName = eventDetails.Event.Name;
+            }
+            return View(model);
         }
     }
 }

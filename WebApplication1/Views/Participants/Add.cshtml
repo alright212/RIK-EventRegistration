@@ -1,15 +1,13 @@
-@using System.Linq
-@model EventRegistration.Application.EventDetailViewModel
+@model EventRegistration.Application.AddOrEditParticipantViewModel
 @{
-    ViewData["Title"] = "Osavõtjad";
+    ViewData["Title"] = "Lisa osavõtja";
 }
 
 <div class="px-4 py-3">
-    @* Header section with image and title *@
     <div class="flex mb-8 h-20">
         <div class="flex w-full">
             <div class="w-1/3 main-blue-bg text-white flex items-center p-3 sm:p-4">
-                <h1 class="text-xl sm:text-2xl font-bold m-0">Osavõtjad</h1>
+                <h1 class="text-xl sm:text-2xl font-bold m-0">Lisa osavõtja</h1>
             </div>
             <div class="w-2/3">
                 <img src="~/images/osalejad.png" alt="Osavõtjate päis" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x300/a0aec0/ffffff?text=Image';" />
@@ -18,67 +16,176 @@
     </div>
 
     <div class="bg-white p-4 sm:p-6">
-        @* Event Information section *@
         <div class="mb-4">
-            <h2 class="text-lg font-bold">@Model.Event.Name</h2>
-            <div class="text-sm text-gray-600">
-                <p><strong>Toimumisaeg:</strong> @Model.Event.EventTime.ToString("dd.MM.yyyy")</p>
-                <p><strong>Koht:</strong> @Model.Event.Location</p>
+            <h2 class="text-lg font-bold">@Model.EventName</h2>
+            <div class="mb-4">
+                <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.EventId" class="text-blue-600 hover:underline text-sm">
+                    ← Tagasi ürituse juurde
+                </a>
             </div>
         </div>
 
-        <h3 class="font-bold text-md mb-2">Osavõtjad:</h3>
-        
-        @* Participant List *@
-        @if (Model.Participants != null && Model.Participants.Any())
-        {
-            <div class="space-y-2">
-                @foreach (var (participant, index) in Model.Participants.Select((p, i) => (p, i + 1)))
+        <div>
+            <h3 class="text-lg font-bold mb-4">Uue osavõtja lisamine</h3>
+            
+            <!-- Add Participant Form -->
+            <form asp-controller="Participants" asp-action="Add" method="post" class="bg-gray-50 p-6 rounded-lg">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="EventId" value="@Model.EventId" />
+                
+                <!-- Display validation errors -->
+                @if (!ViewData.ModelState.IsValid)
                 {
-                    <div class="grid grid-cols-12 gap-x-4 items-center border-b py-2">
-                        <div class="col-span-1 text-right">@index.</div>
-                        <div class="col-span-5 font-semibold">
-                            @if (participant.ParticipantType == "Individual")
+                    <div class="text-red-600 mb-4">
+                        <ul>
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
                             {
-                                @participant.FirstName @participant.LastName
+                                <li>@error.ErrorMessage</li>
                             }
-                            else
-                            {
-                                @participant.LegalName
-                            }
-                        </div>
-                        <div class="col-span-3 text-gray-500">
-                            @if (participant.ParticipantType == "Individual")
-                            {
-                                @participant.PersonalIdCode
-                            }
-                            else
-                            {
-                                @participant.RegistryCode
-                            }
-                        </div>
-                        <div class="col-span-3 flex justify-end space-x-2">
-                            <a asp-controller="Participants" asp-action="Details" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" class="text-blue-600 hover:underline text-sm">VAATA</a>
-                            <form asp-controller="Participants" asp-action="Delete" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" method="post" onsubmit="return confirm('Kas olete kindel, et soovite selle osavõtja kustutada?');" style="display: inline;">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="text-red-600 hover:underline text-sm">KUSTUTA</button>
-                            </form>
-                        </div>
+                        </ul>
                     </div>
                 }
-            </div>
-        }
-        else
-        {
-            <p class="text-center text-gray-500 py-4">Osavõtjaid ei ole veel lisatud.</p>
-        }
+                
+                <!-- Participant Type Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Osavõtja tüüp:</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="ParticipantType" value="Individual" @(Model.ParticipantType == "Individual" ? "checked" : "") class="form-radio text-blue-600" />
+                            <span class="ml-2">Eraisik</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="ParticipantType" value="Company" @(Model.ParticipantType == "Company" ? "checked" : "") class="form-radio text-blue-600" />
+                            <span class="ml-2">Ettevõte</span>
+                        </label>
+                    </div>
+                </div>
 
-        <hr class="my-6"/>
+                <!-- Individual Participant Fields -->
+                <div id="individualFields" style="display: @(Model.ParticipantType == "Individual" ? "block" : "none")">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Eesnimi:</label>
+                            <input name="Individual.FirstName" value="@Model.Individual?.FirstName" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Perekonnanimi:</label>
+                            <input name="Individual.LastName" value="@Model.Individual?.LastName" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Isikukood:</label>
+                        <input name="Individual.PersonalIdCode" value="@Model.Individual?.PersonalIdCode" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="38512345678" />
+                    </div>
+                    
+                    <!-- Payment Method for Individual -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Makseviis:</label>
+                        <select name="Individual.PaymentMethodId" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">Vali makseviis</option>
+                            @foreach (var paymentMethod in Model.PaymentMethods)
+                            {
+                                @if (Model.Individual?.PaymentMethodId.ToString() == paymentMethod.Value)
+                                {
+                                    <option value="@paymentMethod.Value" selected="selected">@paymentMethod.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@paymentMethod.Value">@paymentMethod.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
 
-        @* Add new participant button *@
-        <div>
-            <h3 class="text-lg font-bold mb-4">Osavõtjate lisamine</h3>
-            <a asp-controller="Participants" asp-action="Add" asp-route-eventId="@Model.Event.Id" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Lisa uus osavõtja</a>
+                    <!-- Additional Info for Individual -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lisainfo:</label>
+                        <textarea name="Individual.AdditionalInfo" rows="3" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Märkused või erinõuded...">@Model.Individual?.AdditionalInfo</textarea>
+                    </div>
+                </div>
+
+                <!-- Company Participant Fields -->
+                <div id="companyFields" style="display: @(Model.ParticipantType == "Company" ? "block" : "none")">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Juriidiline nimi:</label>
+                        <input name="Company.LegalName" value="@Model.Company?.LegalName" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Registrikood:</label>
+                            <input name="Company.RegistryCode" value="@Model.Company?.RegistryCode" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="12345678" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Osavõtjate arv:</label>
+                            <input name="Company.NumberOfParticipants" value="@Model.Company?.NumberOfParticipants" type="number" min="1" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Method for Company -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Makseviis:</label>
+                        <select name="Company.PaymentMethodId" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <option value="">Vali makseviis</option>
+                            @foreach (var paymentMethod in Model.PaymentMethods)
+                            {
+                                @if (Model.Company?.PaymentMethodId.ToString() == paymentMethod.Value)
+                                {
+                                    <option value="@paymentMethod.Value" selected="selected">@paymentMethod.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@paymentMethod.Value">@paymentMethod.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Additional Info for Company -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lisainfo:</label>
+                        <textarea name="Company.AdditionalInfo" rows="3" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Märkused või erinõuded...">@Model.Company?.AdditionalInfo</textarea>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-between">
+                    <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.EventId" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Tühista
+                    </a>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Lisa osavõtja
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    // Show/hide participant type fields based on selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const individualRadio = document.querySelector('input[name="ParticipantType"][value="Individual"]');
+        const companyRadio = document.querySelector('input[name="ParticipantType"][value="Company"]');
+        const individualFields = document.getElementById('individualFields');
+        const companyFields = document.getElementById('companyFields');
+        
+        function toggleFields() {
+            if (individualRadio.checked) {
+                individualFields.style.display = 'block';
+                companyFields.style.display = 'none';
+            } else if (companyRadio.checked) {
+                individualFields.style.display = 'none';
+                companyFields.style.display = 'block';
+            }
+        }
+        
+        individualRadio.addEventListener('change', toggleFields);
+        companyRadio.addEventListener('change', toggleFields);
+        
+        // Set default selection if none is selected
+        if (!individualRadio.checked && !companyRadio.checked) {
+            individualRadio.checked = true;
+            toggleFields();
+        }
+    });
+</script>

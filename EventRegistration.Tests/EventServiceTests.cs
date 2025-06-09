@@ -41,9 +41,7 @@ namespace EventRegistration.Tests
                 new Event("Future Event 2", DateTime.UtcNow.AddDays(2), "Location", ""),
                 new Event("Future Event 1", DateTime.UtcNow.AddDays(1), "Location", ""),
             };
-            _mockEventRepository
-                .Setup(repo => repo.GetUpcomingEvents())
-                .ReturnsAsync(events.OrderBy(e => e.Time));
+            _mockEventRepository.Setup(repo => repo.GetAllAsync()).ReturnsAsync(events);
 
             var result = await _eventService.GetUpcomingEvents();
             var resultList = result.ToList();
@@ -196,7 +194,7 @@ namespace EventRegistration.Tests
 
             Assert.NotNull(result);
             Assert.Equal(existingEvent.Name, result.Name);
-            Assert.Equal(existingEvent.Time, result.EventTime);
+            Assert.Equal(existingEvent.Time.ToLocalTime(), result.EventTime);
             Assert.Equal(existingEvent.Location, result.Location);
             Assert.Equal(existingEvent.AdditionalInfo, result.AdditionalInfo);
         }

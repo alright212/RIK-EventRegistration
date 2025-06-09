@@ -30,6 +30,11 @@
         }
         
         <div class="mb-4">
+            <div class="mb-4">
+                <a asp-controller="Home" asp-action="Index" class="text-blue-600 hover:underline text-sm">
+                    ← Tagasi avalehele
+                </a>
+            </div>
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h2 class="text-lg font-bold">@Model.Event.Name</h2>
@@ -125,7 +130,7 @@
                 <h3 class="text-lg font-bold mb-4">Osavõtjate lisamine</h3>
                 
                 <!-- Add Participant Form -->
-                <form asp-controller="Participants" asp-action="Add" method="post" class="bg-gray-50 p-6 rounded-lg">
+                <form asp-controller="Participants" asp-action="Add" method="post" class="bg-gray-50 p-6 rounded-lg" id="participant-form">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="EventId" value="@ViewBag.EventId" />
                 
@@ -192,22 +197,35 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Eesnimi: <span class="text-red-500">*</span></label>
                             <input name="Individual.FirstName" value="@TempData["Individual.FirstName"]" 
                                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                                   maxlength="100" required />
+                                   maxlength="100" 
+                                   data-val="true" 
+                                   data-val-required="The FirstName field is required." 
+                                   data-val-length="The field FirstName must be a string with a maximum length of 100."
+                                   data-val-length-max="100" />
+                            <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Individual.FirstName" data-valmsg-replace="true"></span>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Perekonnanimi: <span class="text-red-500">*</span></label>
                             <input name="Individual.LastName" value="@TempData["Individual.LastName"]" 
                                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                                   maxlength="100" required />
+                                   maxlength="100" 
+                                   data-val="true" 
+                                   data-val-required="The LastName field is required." 
+                                   data-val-length="The field LastName must be a string with a maximum length of 100."
+                                   data-val-length-max="100" />
+                            <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Individual.LastName" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Isikukood: <span class="text-red-500">*</span></label>
                         <input name="Individual.PersonalIdCode" value="@TempData["Individual.PersonalIdCode"]" 
                                class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                               placeholder="38512345678" 
-                               pattern="^[3-6]\d{10}$" 
-                               title="Sisestage kehtiv Eesti isikukood (11 numbrit, algab 3-6)" required />
+                               placeholder="38512345678"
+                               data-val="true" 
+                               data-val-required="The PersonalIdCode field is required." 
+                               data-val-regex="Invalid Estonian Personal ID Code."
+                               data-val-regex-pattern="^[3-6]\d{10}$" />
+                        <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Individual.PersonalIdCode" data-valmsg-replace="true"></span>
                         <p class="mt-1 text-sm text-gray-500">Sisestage 11-kohaline Eesti isikukood</p>
                     </div>
                 </div>
@@ -218,7 +236,12 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Juriidiline nimi: <span class="text-red-500">*</span></label>
                         <input name="Company.LegalName" value="@TempData["Company.LegalName"]" 
                                class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                               maxlength="200" required />
+                               maxlength="200" 
+                               data-val="true" 
+                               data-val-required="The LegalName field is required." 
+                               data-val-length="The field LegalName must be a string with a maximum length of 200."
+                               data-val-length-max="200" />
+                        <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Company.LegalName" data-valmsg-replace="true"></span>
                     </div>
                     <div class="grid md:grid-cols-2 gap-4 mb-4">
                         <div>
@@ -226,15 +249,24 @@
                             <input name="Company.RegistryCode" value="@TempData["Company.RegistryCode"]" 
                                    class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
                                    placeholder="12345678" 
-                                   pattern="^\d{8}$" 
-                                   title="Sisestage kehtiv Eesti registrikood (8 numbrit)" required />
+                                   data-val="true" 
+                                   data-val-required="The RegistryCode field is required." 
+                                   data-val-regex="Invalid Estonian Registry Code."
+                                   data-val-regex-pattern="^\d{8}$" />
+                            <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Company.RegistryCode" data-valmsg-replace="true"></span>
                             <p class="mt-1 text-sm text-gray-500">8-kohaline numbriline kood</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Osavõtjate arv: <span class="text-red-500">*</span></label>
                             <input name="Company.NumberOfParticipants" value="@TempData["Company.NumberOfParticipants"]" 
                                    type="number" min="1" max="999999" 
-                                   class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required />
+                                   class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                                   data-val="true" 
+                                   data-val-required="The NumberOfParticipants field is required." 
+                                   data-val-range="Number of participants must be at least 1."
+                                   data-val-range-min="1" 
+                                   data-val-range-max="2147483647" />
+                            <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Company.NumberOfParticipants" data-valmsg-replace="true"></span>
                         </div>
                     </div>
                 </div>
@@ -242,7 +274,11 @@
                 <!-- Payment Method (Common for both) -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Makseviis: <span class="text-red-500">*</span></label>
-                    <select id="payment-method-individual" name="Individual.PaymentMethodId" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "display: none;" : "")" required>
+                    <select id="payment-method-individual" name="Individual.PaymentMethodId" 
+                            class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                            style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "display: none;" : "")"
+                            data-val="true" 
+                            data-val-required="The PaymentMethodId field is required.">
                         <option value="">Vali makseviis</option>
                         @foreach (var paymentMethod in ViewBag.PaymentMethods)
                         {
@@ -256,8 +292,13 @@
                             }
                         }
                     </select>
+                    <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Individual.PaymentMethodId" data-valmsg-replace="true"></span>
                     
-                    <select id="payment-method-company" name="Company.PaymentMethodId" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "" : "display: none;")" required>
+                    <select id="payment-method-company" name="Company.PaymentMethodId" 
+                            class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                            style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "" : "display: none;")"
+                            data-val="true" 
+                            data-val-required="The PaymentMethodId field is required.">
                         <option value="">Vali makseviis</option>
                         @foreach (var paymentMethod in ViewBag.PaymentMethods)
                         {
@@ -271,19 +312,34 @@
                             }
                         }
                     </select>
+                    <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Company.PaymentMethodId" data-valmsg-replace="true"></span>
                 </div>
 
                 <!-- Additional Info (Common for both) -->
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Lisainfo:</label>
-                    <textarea id="additional-info-individual" name="Individual.AdditionalInfo" rows="3" maxlength="1500" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Märkused või erinõuded..." style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "display: none;" : "")">@TempData["Individual.AdditionalInfo"]</textarea>
+                    <textarea id="additional-info-individual" name="Individual.AdditionalInfo" rows="3" maxlength="1500" 
+                              class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                              placeholder="Märkused või erinõuded..." 
+                              style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "display: none;" : "")"
+                              data-val="true" 
+                              data-val-length="The field AdditionalInfo must be a string with a maximum length of 1500."
+                              data-val-length-max="1500">@TempData["Individual.AdditionalInfo"]</textarea>
+                    <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Individual.AdditionalInfo" data-valmsg-replace="true"></span>
                     
-                    <textarea id="additional-info-company" name="Company.AdditionalInfo" rows="3" maxlength="5000" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Märkused või erinõuded..." style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "" : "display: none;")">@TempData["Company.AdditionalInfo"]</textarea>
+                    <textarea id="additional-info-company" name="Company.AdditionalInfo" rows="3" maxlength="5000" 
+                              class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                              placeholder="Märkused või erinõuded..." 
+                              style="@(TempData["ParticipantType"]?.ToString() == "Company" ? "" : "display: none;")"
+                              data-val="true" 
+                              data-val-length="The field AdditionalInfo must be a string with a maximum length of 5000."
+                              data-val-length-max="5000">@TempData["Company.AdditionalInfo"]</textarea>
+                    <span class="field-validation-valid text-red-600 text-sm" data-valmsg-for="Company.AdditionalInfo" data-valmsg-replace="true"></span>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="flex justify-end">
-                    <button type="submit" id="submit-button" disabled class="px-6 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 bg-gray-400 text-gray-700 cursor-not-allowed">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Lisa osavõtja
                     </button>
                 </div>
@@ -295,8 +351,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing form handlers...');
-    
     const individualRadio = document.querySelector('input[value="Individual"]');
     const companyRadio = document.querySelector('input[value="Company"]');
     const individualFields = document.getElementById('individual-fields');
@@ -305,14 +359,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentMethodCompany = document.getElementById('payment-method-company');
     const additionalInfoIndividual = document.getElementById('additional-info-individual');
     const additionalInfoCompany = document.getElementById('additional-info-company');
-    const form = document.querySelector('form[action*="Participants/Add"]');
-    const submitButton = document.getElementById('submit-button');
-    
-    console.log('Form found:', form);
-    console.log('Submit button found:', submitButton);
+    const form = document.getElementById('participant-form');
 
     function toggleFields() {
-        console.log('Toggling fields...');
         if (individualRadio && individualRadio.checked) {
             if (individualFields) individualFields.style.display = 'block';
             if (companyFields) companyFields.style.display = 'none';
@@ -321,11 +370,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (additionalInfoIndividual) additionalInfoIndividual.style.display = 'block';
             if (additionalInfoCompany) additionalInfoCompany.style.display = 'none';
             
-            // Enable validation for individual fields and disable for company fields
-            setRequiredFields(individualFields, true);
-            setRequiredFields(companyFields, false);
-            if (paymentMethodIndividual) paymentMethodIndividual.required = true;
-            if (paymentMethodCompany) paymentMethodCompany.required = false;
+            // Enable/disable validation data attributes for visible fields
+            setValidationEnabled(individualFields, true);
+            setValidationEnabled(companyFields, false);
+            if (paymentMethodIndividual) setValidationEnabled(paymentMethodIndividual, true);
+            if (paymentMethodCompany) setValidationEnabled(paymentMethodCompany, false);
         } else {
             if (individualFields) individualFields.style.display = 'none';
             if (companyFields) companyFields.style.display = 'block';
@@ -334,138 +383,68 @@ document.addEventListener('DOMContentLoaded', function() {
             if (additionalInfoIndividual) additionalInfoIndividual.style.display = 'none';
             if (additionalInfoCompany) additionalInfoCompany.style.display = 'block';
             
-            // Enable validation for company fields and disable for individual fields
-            setRequiredFields(individualFields, false);
-            setRequiredFields(companyFields, true);
-            if (paymentMethodIndividual) paymentMethodIndividual.required = false;
-            if (paymentMethodCompany) paymentMethodCompany.required = true;
+            // Enable/disable validation data attributes for visible fields
+            setValidationEnabled(individualFields, false);
+            setValidationEnabled(companyFields, true);
+            if (paymentMethodIndividual) setValidationEnabled(paymentMethodIndividual, false);
+            if (paymentMethodCompany) setValidationEnabled(paymentMethodCompany, true);
         }
         
-        // Clear any existing validation errors when switching
-        const validationErrors = document.querySelectorAll('.field-validation-error');
-        validationErrors.forEach(error => {
-            error.textContent = '';
+        // Clear validation messages when switching
+        const validationSpans = form.querySelectorAll('.field-validation-error');
+        validationSpans.forEach(span => {
+            span.textContent = '';
+            span.className = 'field-validation-valid text-red-600 text-sm';
         });
         
-        // Clear visual error indicators
-        const allInputs = form.querySelectorAll('input, select, textarea');
-        allInputs.forEach(input => {
-            input.classList.remove('border-red-500');
-            input.classList.add('border-gray-300');
-        });
-        
-        // Check form validity after toggling
-        validateForm();
+        // Re-parse validation for the form after toggling fields
+        if ($.validator && $.validator.unobtrusive) {
+            $.validator.unobtrusive.parse(form);
+        }
     }
     
-    function setRequiredFields(container, required) {
+    function setValidationEnabled(container, enabled) {
         if (!container) return;
-        const inputs = container.querySelectorAll('input[required], select[required]');
+        
+        const inputs = container.querySelectorAll('input, select, textarea');
         inputs.forEach(input => {
-            input.required = required;
-        });
-    }
-
-    function validateForm() {
-        if (!form || !submitButton) return;
-        
-        // Get all visible required fields
-        const visibleRequiredFields = Array.from(form.querySelectorAll('input[required], select[required]'))
-            .filter(field => {
-                let current = field;
-                while (current && current !== document.body) {
-                    if (window.getComputedStyle(current).display === 'none') {
-                        return false;
-                    }
-                    current = current.parentElement;
+            if (enabled) {
+                // Restore validation attributes if they were stored
+                const storedValidation = input.getAttribute('data-stored-val');
+                if (storedValidation) {
+                    input.setAttribute('data-val', storedValidation);
+                    input.removeAttribute('data-stored-val');
                 }
-                return true;
-            });
-        
-        // Check if all visible required fields are filled and valid
-        const isValid = visibleRequiredFields.every(field => {
-            const hasValue = field.value && field.value.trim() !== '';
-            const isValidField = field.checkValidity();
-            return hasValue && isValidField;
-        });
-        
-        // Update submit button state
-        if (isValid) {
-            submitButton.disabled = false;
-            submitButton.className = 'bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 cursor-pointer';
-        } else {
-            submitButton.disabled = true;
-            submitButton.className = 'px-6 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 bg-gray-400 text-gray-700 cursor-not-allowed';
-        }
-        
-        console.log('Form validation result:', isValid, 'Visible required fields:', visibleRequiredFields.length);
-    }
-
-    // Add form submission handler
-    if (form) {
-        console.log('Adding form submit handler...');
-        form.addEventListener('submit', function(e) {
-            console.log('=== FORM SUBMISSION EVENT ===');
-            
-            // Final validation check
-            const validity = form.checkValidity();
-            console.log('Form valid:', validity);
-            
-            if (!validity) {
-                console.log('Form validation failed!');
-                e.preventDefault();
                 
-                const invalidElements = form.querySelectorAll(':invalid');
-                invalidElements.forEach(el => {
-                    console.log('- Invalid element:', el.name, el.validationMessage);
-                    
-                    // Add visual feedback for invalid fields
-                    el.classList.add('border-red-500');
-                    el.classList.remove('border-gray-300');
+                // Restore other validation attributes
+                const attrs = input.attributes;
+                for (let i = 0; i < attrs.length; i++) {
+                    const attr = attrs[i];
+                    if (attr.name.startsWith('data-stored-val-')) {
+                        const newAttrName = attr.name.replace('data-stored-val-', 'data-val-');
+                        input.setAttribute(newAttrName, attr.value);
+                        input.removeAttribute(attr.name);
+                    }
+                }
+            } else {
+                // Store and remove validation attributes
+                const dataVal = input.getAttribute('data-val');
+                if (dataVal) {
+                    input.setAttribute('data-stored-val', dataVal);
+                    input.removeAttribute('data-val');
+                }
+                
+                // Store and remove other validation attributes
+                const attrs = Array.from(input.attributes);
+                attrs.forEach(attr => {
+                    if (attr.name.startsWith('data-val-')) {
+                        const storedAttrName = attr.name.replace('data-val-', 'data-stored-val-');
+                        input.setAttribute(storedAttrName, attr.value);
+                        input.removeAttribute(attr.name);
+                    }
                 });
-                
-                // Scroll to first invalid field
-                if (invalidElements.length > 0) {
-                    invalidElements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    invalidElements[0].focus();
-                }
-                
-                return false;
             }
-            
-            console.log('Form validation passed, submitting...');
-            console.log('==============================');
         });
-        
-        // Add real-time validation on input changes
-        const allFormInputs = form.querySelectorAll('input, select, textarea');
-        allFormInputs.forEach(input => {
-            // Validate on input/change events
-            input.addEventListener('input', validateForm);
-            input.addEventListener('change', validateForm);
-            
-            // Add visual feedback for individual field validation
-            input.addEventListener('blur', function() {
-                if (this.required && this.offsetParent !== null) { // Only validate visible required fields
-                    if (this.value.trim() === '' || !this.checkValidity()) {
-                        this.classList.add('border-red-500');
-                        this.classList.remove('border-gray-300');
-                    } else {
-                        this.classList.remove('border-red-500');
-                        this.classList.add('border-gray-300');
-                    }
-                    validateForm(); // Re-validate entire form
-                }
-            });
-            
-            // Remove error styling when user starts typing
-            input.addEventListener('focus', function() {
-                this.classList.remove('border-red-500');
-                this.classList.add('border-gray-300');
-            });
-        });
-    } else {
-        console.error('Form not found!');
     }
 
     // Personal ID Code autofill functionality
@@ -475,24 +454,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (personalIdCodeInput && firstNameInput && lastNameInput) {
         let debounceTimer;
-        let lastAutofilledIdCode = ''; // Track the last ID code that triggered autofill
-        let isAutofilledData = false; // Track if current name data is from autofill
+        let lastAutofilledIdCode = '';
+        let isAutofilledData = false;
         
-        // Function to clear autofilled data
         function clearAutofilledData() {
             if (isAutofilledData) {
                 firstNameInput.value = '';
                 lastNameInput.value = '';
                 isAutofilledData = false;
                 lastAutofilledIdCode = '';
-                validateForm();
-                console.log('Cleared autofilled data');
             }
         }
         
-        // Function to check if name fields have been manually modified
         function areNameFieldsManuallyModified() {
-            // If no data was autofilled, any content is manual
             if (!isAutofilledData) {
                 return firstNameInput.value.trim() !== '' || lastNameInput.value.trim() !== '';
             }
@@ -502,90 +476,61 @@ document.addEventListener('DOMContentLoaded', function() {
         personalIdCodeInput.addEventListener('input', function() {
             const personalIdCode = this.value.trim();
             
-            // Clear the previous timer
             clearTimeout(debounceTimer);
             
-            // If ID code is empty or incomplete, clear autofilled data
             if (personalIdCode === '' || personalIdCode.length < 11) {
                 clearAutofilledData();
                 return;
             }
             
-            // Only lookup if we have a complete 11-digit Estonian ID code
             if (personalIdCode.length === 11 && /^[3-6]\d{10}$/.test(personalIdCode)) {
-                // If this is the same ID code that we already autofilled, don't do anything
                 if (personalIdCode === lastAutofilledIdCode && isAutofilledData) {
                     return;
                 }
                 
-                // Debounce the API call by 300ms to avoid too many requests
                 debounceTimer = setTimeout(async function() {
                     try {
                         const response = await fetch(`/Participants/LookupByPersonalIdCode?personalIdCode=${encodeURIComponent(personalIdCode)}`);
                         
                         if (response.ok) {
                             const participantData = await response.json();
-                            
-                            // Check if user has manually entered names
                             const hasManualNames = areNameFieldsManuallyModified();
                             
-                            // Only autofill if:
-                            // 1. Name fields are empty, OR
-                            // 2. Current data is from previous autofill (not manual entry)
                             if (!hasManualNames || isAutofilledData) {
                                 firstNameInput.value = participantData.firstName;
                                 lastNameInput.value = participantData.lastName;
                                 isAutofilledData = true;
                                 lastAutofilledIdCode = personalIdCode;
-                                
-                                // Trigger validation after filling the fields
-                                validateForm();
-                                
-                                console.log('Autofilled participant data:', participantData);
-                            } else {
-                                // User has manually entered names, don't override
-                                console.log('Names manually entered, not overriding with autofill data');
                             }
                         } else if (response.status === 404) {
-                            // Participant not found - clear autofilled data if it was from a different ID
                             if (isAutofilledData && personalIdCode !== lastAutofilledIdCode) {
                                 clearAutofilledData();
                             }
-                            console.log('Participant not found in database (this is normal for new participants)');
                         }
                     } catch (error) {
                         console.error('Error looking up participant:', error);
-                        // Fail silently - don't show error to user as this is an enhancement feature
                     }
                 }, 300);
             } else {
-                // Invalid ID code format, clear autofilled data
                 clearAutofilledData();
             }
         });
         
-        // Track manual changes to name fields
         firstNameInput.addEventListener('input', function() {
             if (isAutofilledData && this.value !== '') {
-                // User is manually editing autofilled data
                 isAutofilledData = false;
                 lastAutofilledIdCode = '';
-                console.log('User manually modified first name, disabling autofill override');
             }
         });
         
         lastNameInput.addEventListener('input', function() {
             if (isAutofilledData && this.value !== '') {
-                // User is manually editing autofilled data
                 isAutofilledData = false;
                 lastAutofilledIdCode = '';
-                console.log('User manually modified last name, disabling autofill override');
             }
         });
         
-        // Also handle autofill/autocomplete events from the browser
         personalIdCodeInput.addEventListener('change', function() {
-            // Trigger the same logic for browser autofill
             this.dispatchEvent(new Event('input'));
         });
     }
@@ -593,30 +538,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Company Registry Code autofill functionality
     const registryCodeInput = document.querySelector('input[name="Company.RegistryCode"]');
     const legalNameInput = document.querySelector('input[name="Company.LegalName"]');
-    const numberOfParticipantsInput = document.querySelector('input[name="Company.NumberOfParticipants"]');
     
-    if (registryCodeInput && legalNameInput && numberOfParticipantsInput) {
+    if (registryCodeInput && legalNameInput) {
         let companyDebounceTimer;
-        let lastAutofilledRegistryCode = ''; // Track the last registry code that triggered autofill
-        let isCompanyAutofilledData = false; // Track if current company data is from autofill
+        let lastAutofilledRegistryCode = '';
+        let isCompanyAutofilledData = false;
         
-        // Function to clear company autofilled data
         function clearCompanyAutofilledData() {
             if (isCompanyAutofilledData) {
                 legalNameInput.value = '';
-                numberOfParticipantsInput.value = '';
                 isCompanyAutofilledData = false;
                 lastAutofilledRegistryCode = '';
-                validateForm();
-                console.log('Cleared company autofilled data');
             }
         }
         
-        // Function to check if company fields have been manually modified
         function areCompanyFieldsManuallyModified() {
-            // If no data was autofilled, any content is manual
             if (!isCompanyAutofilledData) {
-                return legalNameInput.value.trim() !== '' || numberOfParticipantsInput.value.trim() !== '';
+                return legalNameInput.value.trim() !== '';
             }
             return false;
         }
@@ -624,90 +562,53 @@ document.addEventListener('DOMContentLoaded', function() {
         registryCodeInput.addEventListener('input', function() {
             const registryCode = this.value.trim();
             
-            // Clear the previous timer
             clearTimeout(companyDebounceTimer);
             
-            // If registry code is empty or incomplete, clear autofilled data
             if (registryCode === '' || registryCode.length < 8) {
                 clearCompanyAutofilledData();
                 return;
             }
             
-            // Only lookup if we have a complete 8-digit Estonian registry code
             if (registryCode.length === 8 && /^\d{8}$/.test(registryCode)) {
-                // If this is the same registry code that we already autofilled, don't do anything
                 if (registryCode === lastAutofilledRegistryCode && isCompanyAutofilledData) {
                     return;
                 }
                 
-                // Debounce the API call by 300ms to avoid too many requests
                 companyDebounceTimer = setTimeout(async function() {
                     try {
                         const response = await fetch(`/Participants/LookupByRegistryCode?registryCode=${encodeURIComponent(registryCode)}`);
                         
                         if (response.ok) {
                             const companyData = await response.json();
-                            
-                            // Check if user has manually entered company data
                             const hasManualCompanyData = areCompanyFieldsManuallyModified();
                             
-                            // Only autofill if:
-                            // 1. Company fields are empty, OR
-                            // 2. Current data is from previous autofill (not manual entry)
                             if (!hasManualCompanyData || isCompanyAutofilledData) {
                                 legalNameInput.value = companyData.legalName;
-                                // Note: NumberOfParticipants is not autofilled as it's event-specific
                                 isCompanyAutofilledData = true;
                                 lastAutofilledRegistryCode = registryCode;
-                                
-                                // Trigger validation after filling the fields
-                                validateForm();
-                                
-                                console.log('Autofilled company data:', companyData);
-                            } else {
-                                // User has manually entered company data, don't override
-                                console.log('Company data manually entered, not overriding with autofill data');
                             }
                         } else if (response.status === 404) {
-                            // Company not found - clear autofilled data if it was from a different registry code
                             if (isCompanyAutofilledData && registryCode !== lastAutofilledRegistryCode) {
                                 clearCompanyAutofilledData();
                             }
-                            console.log('Company not found in database (this is normal for new companies)');
                         }
                     } catch (error) {
                         console.error('Error looking up company:', error);
-                        // Fail silently - don't show error to user as this is an enhancement feature
                     }
                 }, 300);
             } else {
-                // Invalid registry code format, clear autofilled data
                 clearCompanyAutofilledData();
             }
         });
         
-        // Track manual changes to company fields
         legalNameInput.addEventListener('input', function() {
             if (isCompanyAutofilledData && this.value !== '') {
-                // User is manually editing autofilled data
                 isCompanyAutofilledData = false;
                 lastAutofilledRegistryCode = '';
-                console.log('User manually modified legal name, disabling company autofill override');
             }
         });
         
-        numberOfParticipantsInput.addEventListener('input', function() {
-            if (isCompanyAutofilledData && this.value !== '') {
-                // User is manually editing autofilled data
-                isCompanyAutofilledData = false;
-                lastAutofilledRegistryCode = '';
-                console.log('User manually modified number of participants, disabling company autofill override');
-            }
-        });
-        
-        // Also handle autofill/autocomplete events from the browser
         registryCodeInput.addEventListener('change', function() {
-            // Trigger the same logic for browser autofill
             this.dispatchEvent(new Event('input'));
         });
     }
@@ -722,12 +623,5 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initial setup
     toggleFields();
-    validateForm(); // Initial validation
-    console.log('Form initialization complete.');
-});
-
-// Global error handler
-window.addEventListener('error', function(e) {
-    console.error('JavaScript error:', e.error);
 });
 </script>

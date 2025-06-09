@@ -5,7 +5,7 @@ namespace EventRegistration.Domain
 {
     public abstract class Participant
     {
-        public int Id { get; private set; }
+        public int Id { get; protected set; }
         public ICollection<EventParticipant> EventParticipants { get; set; }
 
         protected Participant()

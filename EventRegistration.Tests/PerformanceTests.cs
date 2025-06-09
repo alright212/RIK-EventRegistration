@@ -40,8 +40,8 @@ namespace EventRegistration.Tests
             // Arrange
             var largeEventList = GenerateLargeEventList(1000);
             _mockEventRepository
-                .Setup(repo => repo.GetUpcomingEvents())
-                .ReturnsAsync(largeEventList.OrderBy(e => e.Time));
+                .Setup(repo => repo.GetAllAsync())
+                .ReturnsAsync(largeEventList);
 
             // Act
             var stopwatch = Stopwatch.StartNew();

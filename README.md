@@ -2,6 +2,8 @@
 
 A comprehensive event management system built with ASP.NET Core that allows users to create events and manage participant registrations for both individual and company participants.
 
+🚀 **Live Demo**: Deployed on [Railway](https://railway.app) - [View Application](https://web-production-490ea.up.railway.app)
+
 ## Features
 
 - 📅 **Event Management**: Create, update, delete, and view events
@@ -25,7 +27,8 @@ EventRegistration/
 ## Prerequisites
 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (or SQL Server Express/LocalDB)
+- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (or SQL Server Express/LocalDB for local development)
+- [PostgreSQL](https://www.postgresql.org/) (for Railway deployment)
 - [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio](https://visualstudio.microsoft.com/)
 
 ## Getting Started
@@ -45,7 +48,11 @@ dotnet restore
 
 ### 3. Database Setup
 
-The application uses Entity Framework Core with SQL Server. Update the connection string in `WebApplication1/appsettings.json`:
+The application supports both SQL Server (for local development) and PostgreSQL (for Railway deployment). The database provider is automatically detected based on the connection string.
+
+**For Local Development (SQL Server):**
+
+Update the connection string in `WebApplication1/appsettings.json`:
 
 ```json
 {
@@ -54,6 +61,10 @@ The application uses Entity Framework Core with SQL Server. Update the connectio
   }
 }
 ```
+
+**For Railway Deployment (PostgreSQL):**
+
+The application automatically uses PostgreSQL when deployed to Railway. See the [Railway Setup Guide](railway-setup.md) for detailed instructions.
 
 ### 4. Apply Database Migrations
 
@@ -72,7 +83,7 @@ Load sample data using the provided SQL script:
 ```
 
 ## Running the Application
-
+ 
 ### Development Mode
 
 ```bash
@@ -198,6 +209,51 @@ The project includes comprehensive test coverage with **58+ tests** covering:
 6. **PerformanceTests** (2 tests) - Performance validation
 7. **ConcurrencyTests** (2 tests) - Concurrent operation handling
 
+## Deployment
+
+### Railway Deployment
+
+This application is configured for easy deployment on [Railway](https://railway.app):
+
+#### Quick Deploy to Railway
+
+1. **Fork this repository** to your GitHub account
+
+2. **Create a Railway account** at [railway.app](https://railway.app)
+
+3. **Deploy from GitHub:**
+   - Click "New Project" in Railway
+   - Select "Deploy from GitHub repo"
+   - Choose your forked repository
+   - Railway will automatically detect the .NET application
+
+4. **Add PostgreSQL database:**
+   - In your Railway project, click "New Service"
+   - Select "Database" → "PostgreSQL"
+   - Railway will automatically provide the connection string
+
+5. **Configure environment variables:**
+   - Go to your app service → "Variables" tab
+   - Railway should automatically set `DATABASE_URL`
+   - If needed, manually add: `ConnectionStrings__DefaultConnection` with your PostgreSQL connection string
+
+6. **Deploy!**
+   - Railway will automatically build and deploy your application
+   - Your app will be available at `https://your-app-name.up.railway.app`
+
+#### Database Configuration
+
+The application automatically detects the database provider:
+- **PostgreSQL**: Used when connection string contains "postgresql" (Railway deployment)
+- **SQL Server**: Used for local development
+- **SQLite**: Fallback option with persistent storage via Railway volumes
+
+For detailed Railway setup instructions, see [Railway Setup Guide](railway-setup.md).
+
+#### Other Deployment Options
+
+For alternative deployment options including Azure App Service, Render, and more, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## Code Formatting
 
 The project uses CSharpier for code formatting:
@@ -259,9 +315,10 @@ dotnet csharpier check .
 
 3. **Infrastructure Layer** (`EventRegistration.Infrastructure`)
 
-   - Entity Framework DbContext
+   - Entity Framework DbContext with multi-database support
    - Repository implementations
    - Data access logic
+   - Automatic database provider detection (SQL Server, PostgreSQL, SQLite)
 
 4. **Presentation Layer** (`WebApplication1`)
    - MVC Controllers and Views
@@ -313,17 +370,24 @@ dotnet csharpier check .
 
 1. **Database Connection Issues**
 
-   - Verify SQL Server is running
-   - Check connection string in `appsettings.json`
+   - **Local Development**: Verify SQL Server is running and check connection string in `appsettings.json`
+   - **Railway Deployment**: Check that PostgreSQL service is added and `DATABASE_URL` environment variable is set
    - Ensure database exists and migrations are applied
 
-2. **Test Failures**
+2. **Railway Deployment Issues**
+
+   - Verify the repository is connected to Railway
+   - Check build logs in Railway dashboard for errors
+   - Ensure environment variables are properly configured
+   - Review [Railway Setup Guide](railway-setup.md) for troubleshooting steps
+
+3. **Test Failures**
 
    - Run `dotnet clean` and `dotnet restore`
    - Check that all test dependencies are installed
    - Verify test data setup in test files
 
-3. **Build Errors**
+4. **Build Errors**
    - Ensure .NET 8.0 SDK is installed
    - Run `dotnet restore` to restore packages
    - Check for missing using statements or references
@@ -347,6 +411,19 @@ dotnet csharpier check .
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Deployment
+
+🚀 **Live Demo**: This application is deployed on [Railway](https://railway.app), a modern application deployment platform that provides:
+
+- **Automatic deployments** from GitHub
+- **PostgreSQL database** with automatic backups
+- **Zero-configuration** deployment for .NET applications
+- **Environment variable** management
+- **Custom domains** and SSL certificates
+- **Monitoring and logs** dashboard
+
+For deployment instructions, see the [Railway Setup Guide](railway-setup.md) or [DEPLOYMENT.md](DEPLOYMENT.md) for other hosting options.
 
 ---
 
