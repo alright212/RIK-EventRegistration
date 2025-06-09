@@ -63,8 +63,9 @@ namespace EventRegistration.Application
         public async Task<IEnumerable<EventViewModel>> GetPastEvents()
         {
             var events = await _eventRepository.GetAllAsync();
+            var currentTime = DateTime.Now;
             return events
-                .Where(e => e.Time <= DateTime.UtcNow)
+                .Where(e => e.Time <= currentTime)
                 .Select(e => new EventViewModel
                 {
                     Id = e.Id,
@@ -146,7 +147,7 @@ namespace EventRegistration.Application
                 return;
             }
 
-            if (eventToDelete.Time <= DateTime.UtcNow)
+            if (eventToDelete.Time <= DateTime.Now)
             {
                 throw new InvalidOperationException("Cannot delete past or current events.");
             }

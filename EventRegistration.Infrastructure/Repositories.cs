@@ -56,8 +56,9 @@ namespace EventRegistration.Infrastructure
 
         public async Task<IEnumerable<Event>> GetUpcomingEvents()
         {
+            var currentTime = DateTime.Now;
             return await _context
-                .Events.Where(e => e.Time > DateTime.UtcNow)
+                .Events.Where(e => e.Time > currentTime)
                 .OrderBy(e => e.Time)
                 .ToListAsync();
         }

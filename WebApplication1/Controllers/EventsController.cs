@@ -87,7 +87,7 @@ namespace WebApplication1.Controllers
             }
 
             // Prevent editing past events
-            if (eventDto.EventTime <= DateTime.UtcNow)
+            if (eventDto.EventTime <= DateTime.Now)
             {
                 return RedirectToAction("Details", new { id = id });
             }
@@ -113,7 +113,7 @@ namespace WebApplication1.Controllers
             }
 
             // Prevent editing past events
-            if (existingEvent.EventTime <= DateTime.UtcNow)
+            if (existingEvent.EventTime <= DateTime.Now)
             {
                 return RedirectToAction("Details", new { id = id });
             }

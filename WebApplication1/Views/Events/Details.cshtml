@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 @{
-                    var isPastEvent = Model.Event.EventTime <= DateTime.UtcNow;
+                    var isPastEvent = Model.Event.EventTime <= DateTime.Now;
                 }
                 @if (!isPastEvent)
                 {

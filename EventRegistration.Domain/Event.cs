@@ -37,7 +37,7 @@ namespace EventRegistration.Domain
 
         public Event(string name, DateTime eventTime, string location, string additionalInfo)
         {
-            if (eventTime <= DateTime.UtcNow)
+            if (eventTime <= DateTime.Now)
             {
                 throw new ArgumentException("Event time must be in the future.", nameof(eventTime));
             }
@@ -57,7 +57,7 @@ namespace EventRegistration.Domain
             string? additionalInfo
         )
         {
-            if (eventTime <= DateTime.UtcNow)
+            if (eventTime <= DateTime.Now)
             {
                 throw new ArgumentException("Event time must be in the future.", nameof(eventTime));
             }

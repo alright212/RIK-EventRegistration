@@ -26,7 +26,7 @@ namespace WebApplication1.Controllers
         private async Task<bool> IsEventInPast(Guid eventId)
         {
             var eventDetails = await _eventService.GetEventDetail(eventId);
-            return eventDetails?.Event.EventTime <= DateTime.UtcNow;
+            return eventDetails?.Event.EventTime <= DateTime.Now;
         }
 
         // GET: Participants/Add/{eventId}

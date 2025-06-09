@@ -1,7 +1,7 @@
 @model EventRegistration.Application.ParticipantViewModel
 @{
     ViewData["Title"] = "Osavõtja andmed";
-    var isPastEvent = ViewBag.EventTime != null && (DateTime)ViewBag.EventTime <= DateTime.UtcNow;
+    var isPastEvent = ViewBag.EventTime != null && (DateTime)ViewBag.EventTime <= DateTime.Now;
 }
 
 <div class="flex mb-8 h-20">
