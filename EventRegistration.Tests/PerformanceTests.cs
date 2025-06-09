@@ -57,7 +57,7 @@ namespace EventRegistration.Tests
         public async Task GetPastEvents_ShouldHandleLargeDataSet()
         {
             // Arrange
-            var largeEventList = GenerateLargeEventList(1000);
+            var largeEventList = GenerateLargeEventListWithPastEvents(1000);
             _mockEventRepository.Setup(repo => repo.GetAllAsync()).ReturnsAsync(largeEventList);
 
             // Act
@@ -78,7 +78,8 @@ namespace EventRegistration.Tests
 
             for (int i = 0; i < count; i++)
             {
-                var daysOffset = random.Next(-365, 365); // Events from past year to next year
+                // Generate events from 1 day to 2 years in the future only
+                var daysOffset = random.Next(1, 730); // Only future events
                 var eventTime = DateTime.UtcNow.AddDays(daysOffset);
 
                 events.Add(
@@ -89,6 +90,34 @@ namespace EventRegistration.Tests
                         $"Additional info for event {i}"
                     )
                 );
+            }
+
+            return events;
+        }
+
+        private static List<Event> GenerateLargeEventListWithPastEvents(int count)
+        {
+            var events = new List<Event>();
+            var random = new Random();
+
+            for (int i = 0; i < count; i++)
+            {
+                // Create event using parameterless constructor to bypass validation
+                var pastEvent = new Event();
+
+                // Set properties directly for past events
+                pastEvent.Id = Guid.NewGuid();
+                pastEvent.Name = $"Past Event {i}";
+                pastEvent.Location = $"Location {i}";
+                pastEvent.AdditionalInfo = $"Additional info for past event {i}";
+
+                // Set a past date (1-365 days ago)
+                var daysOffset = random.Next(1, 365);
+                pastEvent.Time = DateTime.UtcNow.AddDays(-daysOffset);
+
+                pastEvent.Participants = new HashSet<EventParticipant>();
+
+                events.Add(pastEvent);
             }
 
             return events;
