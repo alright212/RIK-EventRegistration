@@ -64,6 +64,9 @@ if (
         );
     }
 
+    // Configure PostgreSQL to handle DateTime properly
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
     builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
         options.UseNpgsql(pgConnectionString)
     );
