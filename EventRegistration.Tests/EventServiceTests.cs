@@ -129,5 +129,156 @@ namespace EventRegistration.Tests
 
             Assert.Null(result);
         }
+
+        [Fact]
+        public async Task CreateEvent_ShouldCreateEvent_WhenValidData()
+        {
+            var createDto = new CreateEventDto
+            {
+                Name = "Test Event",
+                EventTime = DateTime.UtcNow.AddDays(1),
+                Location = "Test Location",
+                AdditionalInfo = "Test additional info",
+            };
+
+            await _eventService.CreateEvent(createDto);
+
+            _mockEventRepository.Verify(
+                repo =>
+                    repo.AddAsync(
+                        It.Is<Event>(e =>
+                            e.Name == createDto.Name
+                            && e.Time == createDto.EventTime
+                            && e.Location == createDto.Location
+                            && e.AdditionalInfo == createDto.AdditionalInfo
+                        )
+                    ),
+                Times.Once
+            );
+        }
+
+        [Fact]
+        public async Task CreateEvent_ShouldThrowException_WhenAdditionalInfoTooLong()
+        {
+            var createDto = new CreateEventDto
+            {
+                Name = "Test Event",
+                EventTime = DateTime.UtcNow.AddDays(1),
+                Location = "Test Location",
+                AdditionalInfo = new string('x', 1001), // 1001 characters
+            };
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _eventService.CreateEvent(createDto)
+            );
+            Assert.Equal(
+                "Additional info cannot exceed 1000 characters. (Parameter 'AdditionalInfo')",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public async Task GetEventForEdit_ShouldReturnUpdateEventDto_WhenEventExists()
+        {
+            var eventId = Guid.NewGuid();
+            var existingEvent = new Event(
+                "Test Event",
+                DateTime.UtcNow.AddDays(1),
+                "Test Location",
+                "Test Info"
+            );
+
+            _mockEventRepository
+                .Setup(repo => repo.GetByIdAsync(eventId))
+                .ReturnsAsync(existingEvent);
+
+            var result = await _eventService.GetEventForEdit(eventId);
+
+            Assert.NotNull(result);
+            Assert.Equal(existingEvent.Name, result.Name);
+            Assert.Equal(existingEvent.Time, result.EventTime);
+            Assert.Equal(existingEvent.Location, result.Location);
+            Assert.Equal(existingEvent.AdditionalInfo, result.AdditionalInfo);
+        }
+
+        [Fact]
+        public async Task GetEventForEdit_ShouldReturnNull_WhenEventNotFound()
+        {
+            var eventId = Guid.NewGuid();
+            _mockEventRepository
+                .Setup(repo => repo.GetByIdAsync(eventId))
+                .ReturnsAsync((Event?)null);
+
+            var result = await _eventService.GetEventForEdit(eventId);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_ShouldUpdateEvent_WhenEventExists()
+        {
+            var eventId = Guid.NewGuid();
+            var existingEvent = new Event(
+                "Original Event",
+                DateTime.UtcNow.AddDays(1),
+                "Original Location",
+                "Original Info"
+            );
+            var updateDto = new UpdateEventDto
+            {
+                Name = "Updated Event",
+                EventTime = DateTime.UtcNow.AddDays(2),
+                Location = "Updated Location",
+                AdditionalInfo = "Updated Info",
+            };
+
+            _mockEventRepository
+                .Setup(repo => repo.GetByIdAsync(eventId))
+                .ReturnsAsync(existingEvent);
+
+            await _eventService.UpdateEvent(eventId, updateDto);
+
+            _mockEventRepository.Verify(repo => repo.UpdateAsync(existingEvent), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetEventDetail_ShouldReturnEventDetailViewModel_WhenEventExists()
+        {
+            var eventId = Guid.NewGuid();
+            var existingEvent = new Event(
+                "Test Event",
+                DateTime.UtcNow.AddDays(1),
+                "Test Location",
+                "Test Info"
+            );
+
+            // Set the Id using reflection since it might be read-only
+            typeof(Event).GetProperty(nameof(Event.Id))?.SetValue(existingEvent, eventId);
+
+            _mockEventRepository
+                .Setup(repo => repo.GetEventWithParticipantsAsync(eventId))
+                .ReturnsAsync(existingEvent);
+
+            var result = await _eventService.GetEventDetail(eventId);
+
+            Assert.NotNull(result);
+            Assert.Equal(eventId, result.Event.Id);
+            Assert.Equal("Test Event", result.Event.Name);
+            Assert.Equal("Test Location", result.Event.Location);
+            Assert.Equal("Test Info", result.Event.AdditionalInfo);
+        }
+
+        [Fact]
+        public async Task DeleteEvent_ShouldDoNothing_WhenEventNotFound()
+        {
+            var eventId = Guid.NewGuid();
+            _mockEventRepository
+                .Setup(repo => repo.GetByIdAsync(eventId))
+                .ReturnsAsync((Event?)null);
+
+            await _eventService.DeleteEvent(eventId);
+
+            _mockEventRepository.Verify(repo => repo.RemoveAsync(It.IsAny<Event>()), Times.Never);
+        }
     }
 }

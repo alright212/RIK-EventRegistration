@@ -26,11 +26,17 @@
                         <p><strong>Koht:</strong> @Model.Event.Location</p>
                     </div>
                 </div>
-                <div class="ml-4">
-                    <a asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Event.Id" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm">
-                        Muuda üritust
-                    </a>
-                </div>
+                @{
+                    var isPastEvent = Model.Event.EventTime <= DateTime.UtcNow;
+                }
+                @if (!isPastEvent)
+                {
+                    <div class="ml-4">
+                        <a asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Event.Id" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm">
+                            Muuda üritust
+                        </a>
+                    </div>
+                }
             </div>
             
             @if (!string.IsNullOrWhiteSpace(Model.Event.AdditionalInfo))
@@ -67,12 +73,22 @@
                             }
                         </div>
                         <div class="col-span-3 flex justify-end space-x-2">
-                            <a asp-controller="Participants" asp-action="Details" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" class="text-blue-600 hover:underline text-sm">VAATA</a>
-                            <a asp-controller="Participants" asp-action="Edit" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" class="text-green-600 hover:underline text-sm">MUUDA</a>
-                            <form asp-controller="Participants" asp-action="Delete" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" method="post" onsubmit="return confirm('Kas olete kindel, et soovite selle osavõtja kustutada?');" style="display: inline;">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="text-red-600 hover:underline text-sm">KUSTUTA</button>
-                            </form>
+                            <a asp-controller="Participants" asp-action="Details" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" class="text-blue-600 hover:underline text-sm flex items-center gap-1">
+                                VAATA 👁
+                            </a>
+                            @if (!isPastEvent)
+                            {
+                                <a asp-controller="Participants" asp-action="Edit" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" class="text-green-600 hover:underline text-sm flex items-center gap-1">
+                                    MUUDA ✏
+                                </a>
+                                <form asp-controller="Participants" asp-action="Delete" asp-route-eventId="@Model.Event.Id" asp-route-participantId="@participant.ParticipantId" method="post" onsubmit="return confirm('Kas olete kindel, et soovite selle osavõtja kustutada?');" style="display: inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="text-red-600 hover:underline text-sm flex items-center gap-1">
+                                        KUSTUTA
+                                        <img src="@Url.Content("~/images/remove.png")" alt="Kustuta" class="w-3 h-3">
+                                    </button>
+                                </form>
+                            }
                         </div>
                     </div>
                 }
@@ -85,11 +101,13 @@
 
         <hr class="my-6"/>
 
-        <div>
-            <h3 class="text-lg font-bold mb-4">Osavõtjate lisamine</h3>
-            
-            <!-- Add Participant Form -->
-            <form asp-controller="Participants" asp-action="Add" method="post" class="bg-gray-50 p-6 rounded-lg">
+        @if (!isPastEvent)
+        {
+            <div>
+                <h3 class="text-lg font-bold mb-4">Osavõtjate lisamine</h3>
+                
+                <!-- Add Participant Form -->
+                <form asp-controller="Participants" asp-action="Add" method="post" class="bg-gray-50 p-6 rounded-lg">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="EventId" value="@ViewBag.EventId" />
                 
@@ -213,6 +231,7 @@
                 </div>
             </form>
         </div>
+        }
     </div>
 </div>
 

@@ -86,6 +86,12 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
+            // Prevent editing past events
+            if (eventDto.EventTime <= DateTime.UtcNow)
+            {
+                return RedirectToAction("Details", new { id = id });
+            }
+
             return View(eventDto);
         }
 
@@ -97,6 +103,19 @@ namespace WebApplication1.Controllers
             if (id == Guid.Empty)
             {
                 return NotFound();
+            }
+
+            // Get the event to check if it's in the past
+            var existingEvent = await _eventService.GetEventForEdit(id);
+            if (existingEvent == null)
+            {
+                return NotFound();
+            }
+
+            // Prevent editing past events
+            if (existingEvent.EventTime <= DateTime.UtcNow)
+            {
+                return RedirectToAction("Details", new { id = id });
             }
 
             if (ModelState.IsValid)

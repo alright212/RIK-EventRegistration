@@ -23,6 +23,12 @@ namespace WebApplication1.Controllers
             _eventService = eventService;
         }
 
+        private async Task<bool> IsEventInPast(Guid eventId)
+        {
+            var eventDetails = await _eventService.GetEventDetail(eventId);
+            return eventDetails?.Event.EventTime <= DateTime.UtcNow;
+        }
+
         // GET: Participants/Add/{eventId}
         public async Task<IActionResult> Add(Guid eventId)
         {
@@ -35,6 +41,12 @@ namespace WebApplication1.Controllers
             if (eventDetails == null)
             {
                 return NotFound();
+            }
+
+            // Prevent adding participants to past events
+            if (await IsEventInPast(eventId))
+            {
+                return RedirectToAction("Details", "Events", new { id = eventId });
             }
 
             var paymentMethods = await _participantService.GetPaymentMethodsAsync();
@@ -58,6 +70,12 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(AddOrEditParticipantViewModel viewModel)
         {
+            // Prevent adding participants to past events
+            if (await IsEventInPast(viewModel.EventId))
+            {
+                return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
+            }
+
             try
             {
                 if (viewModel.ParticipantType == "Individual")
@@ -198,6 +216,12 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
 
+            // Prevent deleting participants from past events
+            if (await IsEventInPast(eventId))
+            {
+                return RedirectToAction("Details", "Events", new { id = eventId });
+            }
+
             // The participantId is now correctly passed as an int.
             await _participantService.DeleteParticipantAsync(participantId, eventId);
 
@@ -240,6 +264,12 @@ namespace WebApplication1.Controllers
             if (eventId == Guid.Empty)
             {
                 return NotFound();
+            }
+
+            // Prevent editing participants of past events
+            if (await IsEventInPast(eventId))
+            {
+                return RedirectToAction("Details", "Events", new { id = eventId });
             }
 
             var participant = await _participantService.GetParticipantDetailsAsync(
@@ -308,6 +338,12 @@ namespace WebApplication1.Controllers
             AddOrEditParticipantViewModel viewModel
         )
         {
+            // Prevent editing participants of past events
+            if (await IsEventInPast(viewModel.EventId))
+            {
+                return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
+            }
+
             try
             {
                 if (viewModel.ParticipantType == "Individual")
