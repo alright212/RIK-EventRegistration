@@ -6,7 +6,7 @@ namespace EventRegistration.Domain
 {
     public class Event
     {
-        public Event pastEvent;
+        public Event? pastEvent;
 
         public Event()
         {
