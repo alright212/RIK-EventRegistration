@@ -51,8 +51,21 @@ if (
 {
     // Use PostgreSQL for production (Railway, etc.)
     Console.WriteLine("Using PostgreSQL provider");
+
+    // Convert Railway PostgreSQL URL to proper connection string format
+    string pgConnectionString = connectionString;
+    if (connectionString.StartsWith("postgresql://"))
+    {
+        var uri = new Uri(connectionString);
+        pgConnectionString =
+            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true;";
+        Console.WriteLine(
+            $"Converted connection string: {pgConnectionString.Replace(uri.UserInfo.Split(':')[1], "****")}"
+        );
+    }
+
     builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
-        options.UseNpgsql(connectionString)
+        options.UseNpgsql(pgConnectionString)
     );
 }
 else
