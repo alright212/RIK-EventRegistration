@@ -1,40 +1,41 @@
-# Azure App Service Deployment Configuration
-name: Deploy to Azure App Service
+# CI/CD Pipeline for Event Registration System
+name: Build and Test
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build-and-test:
+    name: Build and Test Application
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-
-      - name: Test
-        run: dotnet test --no-build --verbosity normal --configuration Release
-
-      - name: Publish
-        run: dotnet publish WebApplication1/WebApplication1.csproj --configuration Release --output ./publish
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: "your-app-name" # Replace with your Azure App Service name
-          slot-name: "production"
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./publish
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build application
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Run tests
+      run: dotnet test --no-build --verbosity normal --configuration Release
+      
+    - name: Publish application
+      run: dotnet publish WebApplication1/WebApplication1.csproj --configuration Release --output ./publish
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: published-app
+        path: ./publish/
+        retention-days: 30
