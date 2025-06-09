@@ -8,10 +8,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configure DbContext with SQLite
-builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+// Configure DbContext - Auto-detect database provider
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (connectionString?.StartsWith("postgresql://") == true || connectionString?.Contains("postgres") == true)
+{
+    // Use PostgreSQL for production (Railway, etc.)
+    builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
+        options.UseNpgsql(connectionString));
+}
+else
+{
+    // Use SQLite for development
+    builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
+        options.UseSqlite(connectionString));
+}
 
 // Register your repositories and services
 // The framework will now 'inject' these wherever they are requested
