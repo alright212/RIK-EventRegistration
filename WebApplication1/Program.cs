@@ -3,6 +3,9 @@ using EventRegistration.Domain;
 using EventRegistration.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
+// Configure PostgreSQL to handle DateTime properly - must be set before any PostgreSQL operations
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -58,17 +61,20 @@ if (
     {
         var uri = new Uri(connectionString);
         pgConnectionString =
-            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true;";
+            $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.Trim('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true;Timezone=UTC;";
         Console.WriteLine(
             $"Converted connection string: {pgConnectionString.Replace(uri.UserInfo.Split(':')[1], "****")}"
         );
     }
 
-    // Configure PostgreSQL to handle DateTime properly
-    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
     builder.Services.AddDbContext<EventRegistrationDbContext>(options =>
-        options.UseNpgsql(pgConnectionString)
+        options.UseNpgsql(
+            pgConnectionString,
+            npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure();
+            }
+        )
     );
 }
 else
