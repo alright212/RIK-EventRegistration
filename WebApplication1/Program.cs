@@ -23,6 +23,20 @@ builder.Services.AddScoped<IEventParticipantRepository, EventParticipantReposito
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 
+// --- Add services required for TempData to work with redirects ---
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20); // Set a session timeout
+    options.Cookie.HttpOnly = true;
+    // Make the session cookie essential to bypass cookie policy checks,
+    // which is a common cause for TempData to fail.
+    options.Cookie.IsEssential = true;
+});
+
+// ----------------------------------------------------------------
+
 var app = builder.Build();
 
 // Ensure database is created and migrations are applied
@@ -46,6 +60,12 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+// --- Add the session middleware to the request pipeline ---
+// This must be called after UseRouting() and before MapControllerRoute().
+app.UseSession();
+
+// --------------------------------------------------------
 
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 

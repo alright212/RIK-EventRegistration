@@ -70,12 +70,6 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(AddOrEditParticipantViewModel viewModel)
         {
-            // Prevent adding participants to past events
-            if (await IsEventInPast(viewModel.EventId))
-            {
-                return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
-            }
-
             try
             {
                 if (viewModel.ParticipantType == "Individual")
@@ -166,41 +160,49 @@ namespace WebApplication1.Controllers
                     );
                 }
             }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already registered"))
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Sama isikukoodiga osavõtja on juba sellele üritusele registreeritud. Ühe isikukoodi saab üritusele registreerida ainult ühe korra."
+                );
+            }
             catch (Exception)
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "An error occurred while adding the participant. Please try again."
+                    "Osavõtja lisamisel tekkis viga. Palun proovige uuesti."
                 );
             }
 
-            // If we got this far, something failed
-            // Store validation errors in TempData and redirect back to Events/Details
-            TempData["ValidationErrors"] = ModelState.ToDictionary(
-                kvp => kvp.Key,
-                kvp =>
-                    kvp.Value?.Errors.Select(e => e.ErrorMessage ?? "Validation error").ToArray()
-                    ?? new string[0]
-            );
-
-            // Store the submitted form data to repopulate the form
-            TempData["ParticipantType"] = viewModel.ParticipantType;
+            // If we got this far, something failed, redirect back with form data preserved
+            // Store form values to repopulate the form
             if (viewModel.ParticipantType == "Individual")
             {
-                TempData["Individual.FirstName"] = viewModel.Individual?.FirstName;
-                TempData["Individual.LastName"] = viewModel.Individual?.LastName;
-                TempData["Individual.PersonalIdCode"] = viewModel.Individual?.PersonalIdCode;
-                TempData["Individual.PaymentMethodId"] = viewModel.Individual?.PaymentMethodId;
-                TempData["Individual.AdditionalInfo"] = viewModel.Individual?.AdditionalInfo;
+                TempData["Individual.FirstName"] = viewModel.Individual.FirstName;
+                TempData["Individual.LastName"] = viewModel.Individual.LastName;
+                TempData["Individual.PersonalIdCode"] = viewModel.Individual.PersonalIdCode;
+                TempData["Individual.PaymentMethodId"] = viewModel.Individual.PaymentMethodId;
+                TempData["Individual.AdditionalInfo"] = viewModel.Individual.AdditionalInfo;
             }
             else if (viewModel.ParticipantType == "Company")
             {
-                TempData["Company.LegalName"] = viewModel.Company?.LegalName;
-                TempData["Company.RegistryCode"] = viewModel.Company?.RegistryCode;
-                TempData["Company.NumberOfParticipants"] = viewModel.Company?.NumberOfParticipants;
-                TempData["Company.PaymentMethodId"] = viewModel.Company?.PaymentMethodId;
-                TempData["Company.AdditionalInfo"] = viewModel.Company?.AdditionalInfo;
+                TempData["Company.LegalName"] = viewModel.Company.LegalName;
+                TempData["Company.RegistryCode"] = viewModel.Company.RegistryCode;
+                TempData["Company.NumberOfParticipants"] = viewModel.Company.NumberOfParticipants;
+                TempData["Company.PaymentMethodId"] = viewModel.Company.PaymentMethodId;
+                TempData["Company.AdditionalInfo"] = viewModel.Company.AdditionalInfo;
             }
+
+            TempData["ParticipantType"] = viewModel.ParticipantType;
+
+            // Store validation errors for display
+            var validationErrors = new List<string>();
+            foreach (var modelError in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                validationErrors.Add(modelError.ErrorMessage);
+            }
+            TempData["ValidationErrors"] = validationErrors;
 
             return RedirectToAction("Details", "Events", new { id = viewModel.EventId });
         }
@@ -440,11 +442,18 @@ namespace WebApplication1.Controllers
                     );
                 }
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already registered"))
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    $"An error occurred while updating the participant: {ex.Message}"
+                    "Sama isikukoodiga osavõtja on juba sellele üritusele registreeritud. Ühe isikukoodi saab üritusele registreerida ainult ühe korra."
+                );
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Osavõtja muutmisel tekkis viga. Palun proovige uuesti."
                 );
             }
 
@@ -462,6 +471,44 @@ namespace WebApplication1.Controllers
 
             ViewBag.ParticipantId = participantId;
             return View(viewModel);
+        }
+
+        // API endpoint to lookup participant by personal ID code
+        [HttpGet]
+        public async Task<IActionResult> LookupByPersonalIdCode(string personalIdCode)
+        {
+            if (string.IsNullOrWhiteSpace(personalIdCode))
+            {
+                return BadRequest("Personal ID code is required");
+            }
+
+            var participant = await _participantService.GetIndividualByPersonalIdCodeAsync(
+                personalIdCode
+            );
+            if (participant == null)
+            {
+                return NotFound();
+            }
+
+            return Json(participant);
+        }
+
+        // API endpoint to lookup company by registry code
+        [HttpGet]
+        public async Task<IActionResult> LookupByRegistryCode(string registryCode)
+        {
+            if (string.IsNullOrWhiteSpace(registryCode))
+            {
+                return BadRequest("Registry code is required");
+            }
+
+            var company = await _participantService.GetCompanyByRegistryCodeAsync(registryCode);
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            return Json(company);
         }
     }
 }

@@ -63,6 +63,16 @@ namespace EventRegistration.Application
                 );
                 await _participantRepository.AddAsync(participant);
             }
+            else
+            {
+                // Update the participant's name if it has changed
+                if (participant.FirstName != dto.FirstName || participant.LastName != dto.LastName)
+                {
+                    participant.FirstName = dto.FirstName;
+                    participant.LastName = dto.LastName;
+                    await _participantRepository.UpdateAsync(participant);
+                }
+            }
 
             // The participant.Id is now an int, matching the repository method signature.
             var existingRegistration =
@@ -119,9 +129,23 @@ namespace EventRegistration.Application
             }
             else
             {
+                // Update the participant's information if it has changed
+                bool needsUpdate = false;
+
+                if (participant.LegalName != dto.LegalName)
+                {
+                    participant.LegalName = dto.LegalName;
+                    needsUpdate = true;
+                }
+
                 if (participant.NumberOfParticipants != dto.NumberOfParticipants)
                 {
                     participant.NumberOfParticipants = dto.NumberOfParticipants;
+                    needsUpdate = true;
+                }
+
+                if (needsUpdate)
+                {
                     await _participantRepository.UpdateAsync(participant);
                 }
             }
@@ -294,6 +318,48 @@ namespace EventRegistration.Application
                     Name = pm.Name,
                 })
                 .ToList();
+        }
+
+        public async Task<IndividualParticipantLookupDto?> GetIndividualByPersonalIdCodeAsync(
+            string personalIdCode
+        )
+        {
+            if (string.IsNullOrWhiteSpace(personalIdCode))
+                return null;
+
+            var participant = await _participantRepository.GetIndividualByPersonalIdCodeAsync(
+                personalIdCode
+            );
+            if (participant == null)
+                return null;
+
+            return new IndividualParticipantLookupDto
+            {
+                FirstName = participant.FirstName,
+                LastName = participant.LastName,
+                PersonalIdCode = participant.PersonalIdCode,
+            };
+        }
+
+        public async Task<CompanyParticipantLookupDto?> GetCompanyByRegistryCodeAsync(
+            string registryCode
+        )
+        {
+            if (string.IsNullOrWhiteSpace(registryCode))
+                return null;
+
+            var participant = await _participantRepository.GetCompanyByRegistryCodeAsync(
+                registryCode
+            );
+            if (participant == null)
+                return null;
+
+            return new CompanyParticipantLookupDto
+            {
+                LegalName = participant.LegalName,
+                RegistryCode = participant.RegistryCode,
+                NumberOfParticipants = participant.NumberOfParticipants,
+            };
         }
 
         private ParticipantViewModel MapToParticipantViewModel(EventParticipant eventParticipant)
