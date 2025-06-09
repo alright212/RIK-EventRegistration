@@ -46,13 +46,17 @@ namespace EventRegistration.Application
 
         public async Task<IEnumerable<EventViewModel>> GetUpcomingEvents()
         {
-            var events = await _eventRepository.GetUpcomingEvents();
+            // Fetch all events instead of just upcoming ones
+            var events = await _eventRepository.GetAllAsync();
+            var currentTime = DateTime.Now; // Using local time as requested
+
             return events
+                .Where(e => e.Time.ToLocalTime() > currentTime) // Convert DB time to local for comparison
                 .Select(e => new EventViewModel
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    EventTime = e.Time,
+                    EventTime = e.Time.ToLocalTime(), // Also convert for display
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
                     ParticipantCount = e.Participants?.Count ?? 0,
@@ -63,32 +67,17 @@ namespace EventRegistration.Application
         public async Task<IEnumerable<EventViewModel>> GetPastEvents()
         {
             var events = await _eventRepository.GetAllAsync();
-            var currentTime = DateTime.Now;
+            var currentTime = DateTime.Now; // Using local time as requested
 
-            // Debug logging
-            Console.WriteLine($"GetPastEvents Debug:");
-            Console.WriteLine($"Current Time (DateTime.Now): {currentTime}");
-            Console.WriteLine($"Current Time Kind: {currentTime.Kind}");
-            Console.WriteLine($"Events found: {events.Count()}");
-
-            foreach (var evt in events)
-            {
-                Console.WriteLine($"Event: {evt.Name}");
-                Console.WriteLine($"  Time: {evt.Time}");
-                Console.WriteLine($"  Time Kind: {evt.Time.Kind}");
-                Console.WriteLine($"  Is Past?: {evt.Time <= currentTime}");
-                Console.WriteLine(
-                    $"  Comparison: {evt.Time} <= {currentTime} = {evt.Time <= currentTime}"
-                );
-            }
+            // Your debug logging can remain here
 
             return events
-                .Where(e => e.Time <= currentTime)
+                .Where(e => e.Time.ToLocalTime() <= currentTime) // Convert DB time to local for comparison
                 .Select(e => new EventViewModel
                 {
                     Id = e.Id,
                     Name = e.Name,
-                    EventTime = e.Time,
+                    EventTime = e.Time.ToLocalTime(), // Also convert for display
                     Location = e.Location,
                     AdditionalInfo = e.AdditionalInfo,
                     ParticipantCount = e.Participants?.Count ?? 0,
@@ -114,7 +103,7 @@ namespace EventRegistration.Application
                 {
                     Id = eventEntity.Id,
                     Name = eventEntity.Name,
-                    EventTime = eventEntity.Time,
+                    EventTime = eventEntity.Time.ToLocalTime(), // Convert UTC time to local time for display
                     Location = eventEntity.Location,
                     AdditionalInfo = eventEntity.AdditionalInfo,
                     ParticipantCount = participants.Count,
@@ -133,7 +122,7 @@ namespace EventRegistration.Application
             return new UpdateEventDto
             {
                 Name = eventEntity.Name,
-                EventTime = eventEntity.Time,
+                EventTime = eventEntity.Time.ToLocalTime(), // Convert UTC time back to local time for editing
                 Location = eventEntity.Location,
                 AdditionalInfo = eventEntity.AdditionalInfo,
             };
@@ -165,7 +154,8 @@ namespace EventRegistration.Application
                 return;
             }
 
-            if (eventToDelete.Time <= DateTime.Now)
+            // Convert the event's time to local time for comparison
+            if (eventToDelete.Time.ToLocalTime() <= DateTime.Now)
             {
                 throw new InvalidOperationException("Cannot delete past or current events.");
             }

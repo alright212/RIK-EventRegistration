@@ -87,7 +87,7 @@ namespace WebApplication1.Controllers
             }
 
             // Prevent editing past events
-            if (eventDto.EventTime <= DateTime.Now)
+            if (eventDto.EventTime.ToLocalTime() <= DateTime.Now)
             {
                 return RedirectToAction("Details", new { id = id });
             }
@@ -113,7 +113,7 @@ namespace WebApplication1.Controllers
             }
 
             // Prevent editing past events
-            if (existingEvent.EventTime <= DateTime.Now)
+            if (existingEvent.EventTime.ToLocalTime() <= DateTime.Now)
             {
                 return RedirectToAction("Details", new { id = id });
             }
@@ -140,6 +140,34 @@ namespace WebApplication1.Controllers
             }
 
             return View(updateEventDto);
+        }
+
+        // POST: Events/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                await _eventService.DeleteEvent(id);
+                return RedirectToAction("Index", "Home");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // This handles the case where trying to delete a past event
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Details", new { id = id });
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "An error occurred while deleting the event.";
+                return RedirectToAction("Details", new { id = id });
+            }
         }
     }
 }

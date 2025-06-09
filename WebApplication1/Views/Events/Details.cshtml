@@ -22,6 +22,13 @@
     </div>
 
     <div class="bg-white p-4 sm:p-6">
+        @if (TempData["Error"] != null)
+        {
+            <div class="mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded-md">
+                @TempData["Error"]
+            </div>
+        }
+        
         <div class="mb-4">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
@@ -36,10 +43,16 @@
                 }
                 @if (!isPastEvent)
                 {
-                    <div class="ml-4">
+                    <div class="ml-4 flex gap-2">
                         <a asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Event.Id" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm">
                             Muuda üritust
                         </a>
+                        <form asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Event.Id" method="post" style="display: inline;" onsubmit="return confirm('Kas oled kindel, et soovid selle ürituse kustutada? Seda toimingut ei saa tagasi võtta.');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm">
+                                Kustuta üritus
+                            </button>
+                        </form>
                     </div>
                 }
             </div>

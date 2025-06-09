@@ -37,14 +37,20 @@ namespace EventRegistration.Domain
 
         public Event(string name, DateTime eventTime, string location, string additionalInfo)
         {
-            if (eventTime <= DateTime.Now)
+            // Convert local time to UTC for consistent storage
+            var utcEventTime =
+                eventTime.Kind == DateTimeKind.Unspecified
+                    ? DateTime.SpecifyKind(eventTime, DateTimeKind.Local).ToUniversalTime()
+                    : eventTime.ToUniversalTime();
+
+            if (utcEventTime <= DateTime.UtcNow)
             {
                 throw new ArgumentException("Event time must be in the future.", nameof(eventTime));
             }
 
             Id = Guid.NewGuid();
             Name = name;
-            Time = eventTime;
+            Time = utcEventTime;
             Location = location;
             AdditionalInfo = additionalInfo;
             Participants = new HashSet<EventParticipant>();
@@ -57,12 +63,18 @@ namespace EventRegistration.Domain
             string? additionalInfo
         )
         {
-            if (eventTime <= DateTime.Now)
+            // Convert local time to UTC for consistent storage
+            var utcEventTime =
+                eventTime.Kind == DateTimeKind.Unspecified
+                    ? DateTime.SpecifyKind(eventTime, DateTimeKind.Local).ToUniversalTime()
+                    : eventTime.ToUniversalTime();
+
+            if (utcEventTime <= DateTime.UtcNow)
             {
                 throw new ArgumentException("Event time must be in the future.", nameof(eventTime));
             }
             Name = name;
-            Time = eventTime;
+            Time = utcEventTime;
             Location = location;
             AdditionalInfo = additionalInfo ?? string.Empty;
         }
