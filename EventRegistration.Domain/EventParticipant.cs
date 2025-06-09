@@ -14,5 +14,8 @@ namespace EventRegistration.Domain
         public PaymentMethod? PaymentMethod { get; set; }
 
         public string? AdditionalInfo { get; set; }
+
+        // Event-specific number of participants for company registrations
+        public int? NumberOfParticipants { get; set; }
     }
 }

@@ -643,7 +643,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             // 2. Current data is from previous autofill (not manual entry)
                             if (!hasManualCompanyData || isCompanyAutofilledData) {
                                 legalNameInput.value = companyData.legalName;
-                                numberOfParticipantsInput.value = companyData.numberOfParticipants;
+                                // Note: NumberOfParticipants is not autofilled as it's event-specific
                                 isCompanyAutofilledData = true;
                                 lastAutofilledRegistryCode = registryCode;
                                 

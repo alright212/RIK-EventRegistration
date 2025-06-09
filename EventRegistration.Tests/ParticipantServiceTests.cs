@@ -289,8 +289,7 @@ namespace EventRegistration.Tests
             );
             var existingParticipant = new CompanyParticipant(
                 dto.LegalName,
-                dto.RegistryCode,
-                dto.NumberOfParticipants
+                dto.RegistryCode
             );
 
             typeof(Participant)
@@ -400,7 +399,7 @@ namespace EventRegistration.Tests
         {
             var eventId = Guid.NewGuid();
             var participant1 = new IndividualParticipant("John", "Doe", "39001011234");
-            var participant2 = new CompanyParticipant("Test Company", "12345678", 5);
+            var participant2 = new CompanyParticipant("Test Company", "12345678");
             var paymentMethod = new PaymentMethod("Cash");
 
             var eventParticipants = new List<EventParticipant>
@@ -456,7 +455,7 @@ namespace EventRegistration.Tests
             var eventId = Guid.NewGuid();
             var participantId = 1;
             var dto = new AddIndividualParticipantDto();
-            var companyParticipant = new CompanyParticipant("Test Company", "12345678", 5);
+            var companyParticipant = new CompanyParticipant("Test Company", "12345678");
             var eventParticipant = new EventParticipant
             {
                 EventId = eventId,

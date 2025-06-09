@@ -33,14 +33,12 @@ namespace EventRegistration.Domain
     {
         public string LegalName { get; set; }
         public string RegistryCode { get; set; }
-        public int NumberOfParticipants { get; set; }
 
-        public CompanyParticipant(string legalName, string registryCode, int numberOfParticipants)
+        public CompanyParticipant(string legalName, string registryCode)
             : base()
         {
             LegalName = legalName;
             RegistryCode = registryCode;
-            NumberOfParticipants = numberOfParticipants;
         }
     }
 }

@@ -122,30 +122,16 @@ namespace EventRegistration.Application
             {
                 participant = new CompanyParticipant(
                     dto.LegalName,
-                    dto.RegistryCode,
-                    dto.NumberOfParticipants
+                    dto.RegistryCode
                 );
                 await _participantRepository.AddAsync(participant);
             }
             else
             {
                 // Update the participant's information if it has changed
-                bool needsUpdate = false;
-
                 if (participant.LegalName != dto.LegalName)
                 {
                     participant.LegalName = dto.LegalName;
-                    needsUpdate = true;
-                }
-
-                if (participant.NumberOfParticipants != dto.NumberOfParticipants)
-                {
-                    participant.NumberOfParticipants = dto.NumberOfParticipants;
-                    needsUpdate = true;
-                }
-
-                if (needsUpdate)
-                {
                     await _participantRepository.UpdateAsync(participant);
                 }
             }
@@ -169,6 +155,7 @@ namespace EventRegistration.Application
                 ParticipantId = participant.Id,
                 PaymentMethodId = dto.PaymentMethodId,
                 AdditionalInfo = dto.AdditionalInfo,
+                NumberOfParticipants = dto.NumberOfParticipants
             };
             await _eventParticipantRepository.AddAsync(eventParticipant);
         }
@@ -274,11 +261,11 @@ namespace EventRegistration.Application
 
             companyParticipant.LegalName = dto.LegalName;
             companyParticipant.RegistryCode = dto.RegistryCode;
-            companyParticipant.NumberOfParticipants = dto.NumberOfParticipants;
             await _participantRepository.UpdateAsync(companyParticipant);
 
             eventParticipant.PaymentMethodId = dto.PaymentMethodId;
             eventParticipant.AdditionalInfo = dto.AdditionalInfo;
+            eventParticipant.NumberOfParticipants = dto.NumberOfParticipants;
             await _eventParticipantRepository.UpdateAsync(eventParticipant);
         }
 
@@ -358,7 +345,6 @@ namespace EventRegistration.Application
             {
                 LegalName = participant.LegalName,
                 RegistryCode = participant.RegistryCode,
-                NumberOfParticipants = participant.NumberOfParticipants,
             };
         }
 
@@ -396,7 +382,7 @@ namespace EventRegistration.Application
                 viewModel.ParticipantType = "Company";
                 viewModel.LegalName = company.LegalName;
                 viewModel.RegistryCode = company.RegistryCode;
-                viewModel.NumberOfParticipants = company.NumberOfParticipants;
+                viewModel.NumberOfParticipants = eventParticipant.NumberOfParticipants ?? 0;
             }
 
             return viewModel;

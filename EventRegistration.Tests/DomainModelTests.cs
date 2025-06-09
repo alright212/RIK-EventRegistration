@@ -106,13 +106,11 @@ namespace EventRegistration.Tests
         {
             var legalName = "Test Company Ltd";
             var registryCode = "12345678";
-            var numberOfParticipants = 5;
 
-            var participant = new CompanyParticipant(legalName, registryCode, numberOfParticipants);
+            var participant = new CompanyParticipant(legalName, registryCode);
 
             Assert.Equal(legalName, participant.LegalName);
             Assert.Equal(registryCode, participant.RegistryCode);
-            Assert.Equal(numberOfParticipants, participant.NumberOfParticipants);
         }
 
         [Fact]

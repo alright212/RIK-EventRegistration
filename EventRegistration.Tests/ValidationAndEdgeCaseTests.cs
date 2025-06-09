@@ -77,11 +77,10 @@ namespace EventRegistration.Tests
         [Fact]
         public void CompanyParticipant_Constructor_ShouldCreateValidParticipant()
         {
-            var participant = new CompanyParticipant("Test Company", "12345678", 5);
+            var participant = new CompanyParticipant("Test Company", "12345678");
 
             Assert.Equal("Test Company", participant.LegalName);
             Assert.Equal("12345678", participant.RegistryCode);
-            Assert.Equal(5, participant.NumberOfParticipants);
         }
 
         [Fact]

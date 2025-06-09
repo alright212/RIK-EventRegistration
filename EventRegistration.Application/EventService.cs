@@ -184,7 +184,7 @@ namespace EventRegistration.Application
                 viewModel.ParticipantType = "Company";
                 viewModel.LegalName = company.LegalName;
                 viewModel.RegistryCode = company.RegistryCode;
-                viewModel.NumberOfParticipants = company.NumberOfParticipants;
+                viewModel.NumberOfParticipants = eventParticipant.NumberOfParticipants ?? 0;
             }
 
             return viewModel;
