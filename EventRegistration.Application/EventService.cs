@@ -64,6 +64,24 @@ namespace EventRegistration.Application
         {
             var events = await _eventRepository.GetAllAsync();
             var currentTime = DateTime.Now;
+
+            // Debug logging
+            Console.WriteLine($"GetPastEvents Debug:");
+            Console.WriteLine($"Current Time (DateTime.Now): {currentTime}");
+            Console.WriteLine($"Current Time Kind: {currentTime.Kind}");
+            Console.WriteLine($"Events found: {events.Count()}");
+
+            foreach (var evt in events)
+            {
+                Console.WriteLine($"Event: {evt.Name}");
+                Console.WriteLine($"  Time: {evt.Time}");
+                Console.WriteLine($"  Time Kind: {evt.Time.Kind}");
+                Console.WriteLine($"  Is Past?: {evt.Time <= currentTime}");
+                Console.WriteLine(
+                    $"  Comparison: {evt.Time} <= {currentTime} = {evt.Time <= currentTime}"
+                );
+            }
+
             return events
                 .Where(e => e.Time <= currentTime)
                 .Select(e => new EventViewModel
