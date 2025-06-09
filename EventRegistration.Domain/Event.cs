@@ -20,7 +20,7 @@ namespace EventRegistration.Domain
         public Guid Id { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(300)]
         public string Name { get; set; }
 
         public DateTime Time { get; set; }

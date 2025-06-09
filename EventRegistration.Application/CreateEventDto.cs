@@ -6,7 +6,7 @@ namespace EventRegistration.Application
     public class CreateEventDto
     {
         [Required(ErrorMessage = "Event name is required.")]
-        [StringLength(100, ErrorMessage = "Event name cannot exceed 100 characters.")]
+        [StringLength(300, ErrorMessage = "Event name cannot exceed 300 characters.")]
         public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Event time is required.")]

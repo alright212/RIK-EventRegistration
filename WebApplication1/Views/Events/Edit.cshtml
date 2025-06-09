@@ -21,7 +21,7 @@
             <div class="mb-4 sm:mb-6 lg:flex lg:items-baseline">
                 <label asp-for="Name" class="block text-sm font-medium text-gray-700 lg:w-1/4 lg:text-right lg:pr-4 mb-2 lg:mb-0">Ürituse nimi:</label>
                 <div class="lg:w-3/4">
-                    <input asp-for="Name" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
+                    <input asp-for="Name" maxlength="300" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
                     <span asp-validation-for="Name" class="text-red-600 text-xs sm:text-sm mt-1 block"></span>
                 </div>
             </div>

@@ -7,9 +7,9 @@ namespace EventRegistration.Application
     {
         [Required(ErrorMessage = "Event name is required.")]
         [StringLength(
-            100,
+            300,
             MinimumLength = 3,
-            ErrorMessage = "Event name must be between 3 and 100 characters."
+            ErrorMessage = "Event name must be between 3 and 300 characters."
         )]
         public string Name { get; set; } = string.Empty;
 
